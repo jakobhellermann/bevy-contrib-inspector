@@ -26,6 +26,6 @@ pub trait AsHtml: Sized {
     type Options;
     const DEFAULT_OPTIONS: Self::Options;
 
-    fn as_html(options: Self::Options, submit_fn: &'static str) -> String;
+    fn as_html(label: &str, options: Self::Options, submit_fn: &'static str) -> String;
     fn parse(value: &str) -> Result<Self, ()>;
 }

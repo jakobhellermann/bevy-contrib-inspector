@@ -167,9 +167,12 @@ fn html<'a>(fields: &[Field<'a>]) -> TokenStream {
             let mut options = #as_html::DEFAULT_OPTIONS;
             #option_fields
             let submit_fn = concat!("(value => handleChange('", #ident_str, "', value))");
-            inputs.push_str(&#as_html::as_html(options, &submit_fn));
+            inputs.push_str(&#as_html::as_html(#ident_str, options, &submit_fn));
         }
     });
+
+    let css = include_str!("../static/style.css");
+    let js = include_str!("../static/script.js");
 
     quote! {
         let mut inputs = String::new();
@@ -179,19 +182,20 @@ fn html<'a>(fields: &[Field<'a>]) -> TokenStream {
 r#"
 <!DOCTYPE html>
 <html>
-<head></head>
+<head>
+<style>{css}</style>
+</head>
 <body>
     <script>
-        function handleChange(field, data) {{
-            let body = field + ':' + data;
-            return fetch("", {{ method: "PUT", body }});
-        }}
+    {js}
     </script>
-    <div>
+    <div id="inputs">
     {inputs}
     </div>
 </body>
 </html>"#,
+            css=#css,
+            js=#js,
             inputs=inputs
         )
     }

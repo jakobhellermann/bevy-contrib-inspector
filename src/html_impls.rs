@@ -12,12 +12,14 @@ macro_rules! impl_ashtml_for_int {
             type Options = NumberAttributes<Self>;
             const DEFAULT_OPTIONS: Self::Options = $default_options;
 
-            fn as_html(options: Self::Options, submit_fn: &str) -> String {
-                format!(
-                    r#"
-        <input type="range" min="{}" max="{}" value="{}" oninput="{}(this.value)">
-        "#,
-                    options.min, options.max, options.default, submit_fn
+            fn as_html(label: &str, options: Self::Options, submit_fn: &str) -> String {
+                format!(r#"
+            <label>
+            {label}
+            <input type="range" min="{}" max="{}" value="{}" oninput="{}(this.value)">
+            </label>"#,
+                    options.min, options.max, options.default, submit_fn,
+                    label = label,
                 )
             }
 
@@ -40,12 +42,15 @@ impl AsHtml for String {
     type Options = ();
     const DEFAULT_OPTIONS: Self::Options = ();
 
-    fn as_html((): Self::Options, submit_fn: &str) -> String {
+    fn as_html(label: &str, (): Self::Options, submit_fn: &str) -> String {
         format!(
             r#"
-        <input type="text" oninput="{}(this.value)">
-        "#,
-            submit_fn
+            <label>
+            {label}
+            <input type="text" oninput="{}(this.value)">
+            </label>"#,
+            submit_fn,
+            label = label,
         )
     }
 
@@ -58,12 +63,16 @@ impl AsHtml for bool {
     type Options = ();
     const DEFAULT_OPTIONS: Self::Options = ();
 
-    fn as_html((): Self::Options, submit_fn: &str) -> String {
+    fn as_html(label: &str, (): Self::Options, submit_fn: &str) -> String {
         format!(
             r#"
-        <input type="checkbox" onchange="{}(this.checked)">
-        "#,
-            submit_fn
+            <label>
+            {label}
+            <input type="checkbox" onchange="{}(this.checked)">
+            </label>
+            "#,
+            submit_fn,
+            label = label,
         )
     }
 
