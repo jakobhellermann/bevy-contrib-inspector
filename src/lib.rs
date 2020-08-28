@@ -1,9 +1,16 @@
 mod inspector_server;
-use bevy::prelude::*;
-
-use inspector_server::{InspectorServer, ServerConfig};
+mod plugin;
 
 pub use bevy_inspector_derive::Inspectable;
+pub use plugin::InspectorPlugin;
+
+pub trait Inspectable: Send + Sync + 'static {
+    fn html() -> String;
+    fn update(&mut self, field: &str, value: String);
+    fn options() -> InspectableOptions {
+        InspectableOptions::default()
+    }
+}
 
 pub struct InspectableOptions {
     pub port: u16,
@@ -14,46 +21,38 @@ impl Default for InspectableOptions {
     }
 }
 
-pub trait Inspectable: Send + Sync + 'static {
-    fn html() -> std::borrow::Cow<'static, str>;
-    fn update(&mut self, field: &str, value: String);
-    fn options() -> InspectableOptions {
-        InspectableOptions::default()
-    }
+pub trait AsHtml: Sized {
+    type Options;
+    const DEFAULT_OPTIONS: Self::Options;
+
+    fn as_html(options: Self::Options, submit_fn: &'static str) -> String;
+    fn parse(value: &str) -> Result<Self, ()>;
 }
 
-#[derive(Default, Clone)]
-pub struct InspectorPlugin<T> {
-    marker: std::marker::PhantomData<T>,
-}
-impl<T> InspectorPlugin<T> {
-    pub fn new() -> InspectorPlugin<T> {
-        InspectorPlugin {
-            marker: std::marker::PhantomData,
-        }
-    }
+pub struct NumberAttributes<T> {
+    pub min: T,
+    pub max: T,
+    pub default: T,
 }
 
-impl<T: Inspectable> InspectorPlugin<T> {
-    fn check(server: Res<InspectorServer>, mut inspectable_data: ResMut<T>) {
-        if let Ok((field, data)) = server.rx.try_recv() {
-            inspectable_data.update(&field, data);
-        }
+impl AsHtml for u64 {
+    type Options = NumberAttributes<Self>;
+    const DEFAULT_OPTIONS: Self::Options = NumberAttributes {
+        min: 0,
+        max: 100,
+        default: 50,
+    };
+
+    fn as_html(options: Self::Options, submit_fn: &'static str) -> String {
+        format!(
+            r#"
+        <input type="range" min="{}" max="{}" value="{}" oninput="{}(this.value)">
+        "#,
+            options.min, options.max, options.default, submit_fn
+        )
     }
 
-    fn start_server(mut commands: Commands) {
-        let config = ServerConfig::new(T::html());
-
-        let options = T::options();
-        let server = InspectorServer::start_in_background(options.port, config).unwrap();
-        commands.insert_resource(server);
-    }
-}
-
-impl<T: Inspectable + Default> Plugin for InspectorPlugin<T> {
-    fn build(&self, app: &mut AppBuilder) {
-        app.add_resource(T::default())
-            .add_startup_system(Self::start_server.system())
-            .add_system(Self::check.system());
+    fn parse(value: &str) -> Result<Self, ()> {
+        value.parse().map_err(drop)
     }
 }

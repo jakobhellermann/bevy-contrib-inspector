@@ -1,5 +1,4 @@
 use crossbeam_channel::{unbounded as channel, Receiver, Sender};
-use std::borrow::Cow;
 use tiny_http::{Method, Request, Response, Server, StatusCode};
 
 type Event = (String, String);
@@ -13,11 +12,11 @@ type Error = Box<dyn std::error::Error + Sync + Send>;
 
 #[derive(Clone)]
 pub struct ServerConfig {
-    html: Cow<'static, str>,
+    html: String,
 }
 
 impl ServerConfig {
-    pub fn new(html: Cow<'static, str>) -> Self {
+    pub fn new(html: String) -> Self {
         ServerConfig { html }
     }
 }
@@ -44,7 +43,7 @@ fn handle_get(config: &ServerConfig, req: Request) -> Result<(), std::io::Error>
     let content_type =
         tiny_http::Header::from_bytes(&b"Content-Type"[..], &b"text/html"[..]).unwrap();
 
-    let mut response = Response::from_string(config.html.as_ref());
+    let mut response = Response::from_string(&config.html);
     response.add_header(content_type);
     req.respond(response)
 }

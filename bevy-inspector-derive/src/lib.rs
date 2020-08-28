@@ -101,6 +101,17 @@ fn expand(data: DeriveData) -> TokenStream {
         options,
     } = data;
 
+    let port = options
+        .port
+        .map(|port| quote! { port: #port, })
+        .unwrap_or_default();
+    let inspectable_options = quote! {
+        bevy_inspector::InspectableOptions {
+            #port
+            ..Default::default()
+        }
+    };
+
     let match_arms = fields.iter().map(|field| {
         let ident = field.ident;
         let ident_str = ident.to_string();
@@ -115,17 +126,6 @@ fn expand(data: DeriveData) -> TokenStream {
 
     let html = html(&fields);
 
-    let port = options
-        .port
-        .map(|port| quote! { port: #port, })
-        .unwrap_or_default();
-    let inspectable_options = quote! {
-        bevy_inspector::InspectableOptions {
-            #port
-            ..Default::default()
-        }
-    };
-
     quote! {
         impl bevy_inspector::Inspectable for #ident {
             fn update(&mut self, field: &str, value: String) {
@@ -135,8 +135,8 @@ fn expand(data: DeriveData) -> TokenStream {
                 }
             }
 
-            fn html() -> std::borrow::Cow<'static, str> {
-                std::borrow::Cow::Borrowed(#html)
+            fn html() -> String {
+                #html
             }
 
             fn options() -> bevy_inspector::InspectableOptions {
@@ -146,11 +146,41 @@ fn expand(data: DeriveData) -> TokenStream {
     }
 }
 
-fn html<'a>(_fields: &[Field<'a>]) -> String {
-    /*for field in fields {
-        match &field.ty {
-            _ => panic!("unsupported type: {:?}", &field.ty),
+fn html<'a>(fields: &[Field<'a>]) -> TokenStream {
+    let fields_as_html = fields.iter().map(|field| {
+        let ty = &field.ty;
+        quote! {
+            let mut options = <#ty as bevy_inspector::AsHtml>::DEFAULT_OPTIONS;
+            // options.min = 5;
+            inputs.push_str(&<#ty as bevy_inspector::AsHtml>::as_html(
+                options,
+                "(value => handleChange('slider', value))")
+            );
         }
-    }*/
-    include_str!("../../index.html").to_string()
+    });
+
+    quote! {
+        let mut inputs = String::new();
+        #(#fields_as_html)*
+
+        format!(
+            r#"
+            <!DOCTYPE html>
+            <html>
+            <head></head>
+            <body>
+                <script>
+                    function handleChange(field, data) {{
+                        let body = field + ':' + data;
+                        return fetch("", {{ method: "PUT", body }});
+                    }}
+                </script>
+                <div>
+                {inputs}
+                </div>
+            </body>
+            </html>"#,
+            inputs=inputs
+        )
+    }
 }

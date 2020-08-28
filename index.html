@@ -5,7 +5,7 @@
 </head>
 
 <body>
-    <input type="range" min="1" max="100" value="50" id="slider">
+    <input type="range" min="1" max="100" value="50" oninput={console.log(this.value)}>
 
     <script>
         function handleChange(field, data) {
@@ -13,10 +13,10 @@
             return fetch("", { method: "PUT", body });
         }
 
-        const el = document.getElementById("slider");
+        /*const el = document.getElementById("slider");
         el.addEventListener("input", (e) => {
             handleChange(e.target.id, e.target.value).catch(console.error);
-        });
+        });*/
 
     </script>
 </body>
