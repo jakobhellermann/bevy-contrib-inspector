@@ -2,7 +2,9 @@ use bevy::prelude::*;
 use bevy_inspector::{Inspectable, InspectorPlugin};
 
 #[derive(Inspectable, Default)]
+#[inspectable(port = 8668)]
 struct Data {
+    #[inspectable(min = 8, max = 32, default = 16)]
     slider: u64,
 }
 

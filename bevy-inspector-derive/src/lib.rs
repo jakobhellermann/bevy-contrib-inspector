@@ -16,8 +16,6 @@ pub fn derive_answer_fn(input: proc_macro::TokenStream) -> proc_macro::TokenStre
         _ => panic!("only named fields are supported"),
     };
 
-    let options = Options::from_attrs(&input.attrs);
-
     let fields = fields
         .iter()
         .map(|field| {
@@ -25,6 +23,7 @@ pub fn derive_answer_fn(input: proc_macro::TokenStream) -> proc_macro::TokenStre
             Field {
                 ident,
                 ty: &field.ty,
+                attrs: &field.attrs,
             }
         })
         .collect();
@@ -32,82 +31,71 @@ pub fn derive_answer_fn(input: proc_macro::TokenStream) -> proc_macro::TokenStre
     let derive_data = DeriveData {
         ident: input.ident,
         fields,
-        options,
+        attrs: &input.attrs,
     };
 
     expand(derive_data).into()
 }
 
-#[derive(Default)]
-struct Options {
-    port: Option<u16>,
-}
-impl Options {
-    fn from_attrs(attrs: &[syn::Attribute]) -> Self {
-        let mut options = Options::default();
-
-        for name_value in attrs
-            .iter()
-            .filter_map(|attr| attr.parse_meta().ok())
-            .filter(|meta| {
-                meta.path()
-                    .get_ident()
-                    .map_or(false, |ident| ident == "inspectable")
-            })
-            .flat_map(|meta| match meta {
-                syn::Meta::Path(_) => panic!("unexpected empty #[inspectable] attribute"),
-                syn::Meta::NameValue(_) => panic!("unexpected name-value attribute"),
-                syn::Meta::List(list) => list.nested,
-            })
-            .map(|nested_meta| match nested_meta {
-                syn::NestedMeta::Lit(_) => panic!("unexpected literal in #[inspectable(..:)]"),
-                syn::NestedMeta::Meta(meta) => meta,
-            })
-            .map(|meta| match meta {
-                syn::Meta::Path(_) => panic!("unexpected empty #[inspectable] attribute"),
-                syn::Meta::List(_) => panic!("unexpected attribute list"),
-                syn::Meta::NameValue(name_value) => name_value,
-            })
-        {
-            match name_value.path.get_ident() {
-                None => panic!("unexpected path: {:?}", name_value.path),
-                Some(ident) if ident == "port" => match name_value.lit {
-                    syn::Lit::Int(port) => options.port = Some(port.base10_parse().unwrap()),
-                    _ => panic!("expected port integer"),
-                },
-                Some(ident) => panic!("unexpected parameter: {}", ident),
+fn struct_fields_from_attrs(attrs: &[syn::Attribute]) -> TokenStream {
+    let values = attrs
+        .iter()
+        .filter_map(|attr| attr.parse_meta().ok())
+        .filter(|meta| {
+            meta.path()
+                .get_ident()
+                .map_or(false, |ident| ident == "inspectable")
+        })
+        .flat_map(|meta| match meta {
+            syn::Meta::Path(_) => panic!("unexpected empty #[inspectable] attribute"),
+            syn::Meta::NameValue(_) => panic!("unexpected name-value attribute"),
+            syn::Meta::List(list) => list.nested,
+        })
+        .map(|nested_meta| match nested_meta {
+            syn::NestedMeta::Lit(_) => panic!("unexpected literal in #[inspectable(..:)]"),
+            syn::NestedMeta::Meta(meta) => meta,
+        })
+        .map(|meta| match meta {
+            syn::Meta::Path(_) => panic!("unexpected empty #[inspectable] attribute"),
+            syn::Meta::List(_) => panic!("unexpected attribute list"),
+            syn::Meta::NameValue(name_value) => name_value,
+        })
+        .map(|name_value| match name_value.path.get_ident() {
+            None => panic!("unexpected path: {:?}", name_value.path),
+            Some(ident) => {
+                let lit = &name_value.lit;
+                quote! { #ident: #lit }
             }
-        }
+        });
 
-        options
+    quote! {
+        #(#values,)*
     }
 }
 
 struct Field<'a> {
     ident: &'a syn::Ident,
     ty: &'a syn::Type,
+    attrs: &'a Vec<syn::Attribute>,
 }
 
 struct DeriveData<'a> {
     ident: syn::Ident,
     fields: Vec<Field<'a>>,
-    options: Options,
+    attrs: &'a Vec<syn::Attribute>,
 }
 
 fn expand(data: DeriveData) -> TokenStream {
     let DeriveData {
         ident,
         fields,
-        options,
+        attrs,
     } = data;
 
-    let port = options
-        .port
-        .map(|port| quote! { port: #port, })
-        .unwrap_or_default();
+    let inspectable_fields = struct_fields_from_attrs(&attrs);
     let inspectable_options = quote! {
         bevy_inspector::InspectableOptions {
-            #port
+            #inspectable_fields
             ..Default::default()
         }
     };
@@ -149,10 +137,19 @@ fn expand(data: DeriveData) -> TokenStream {
 fn html<'a>(fields: &[Field<'a>]) -> TokenStream {
     let fields_as_html = fields.iter().map(|field| {
         let ty = &field.ty;
+        let attrs = &field.attrs;
+
+        let ty = quote! { <#ty as bevy_inspector::AsHtml> };
+        let option_fields = struct_fields_from_attrs(&attrs);
         quote! {
-            let mut options = <#ty as bevy_inspector::AsHtml>::DEFAULT_OPTIONS;
-            // options.min = 5;
-            inputs.push_str(&<#ty as bevy_inspector::AsHtml>::as_html(
+            let options = {
+                type Options = #ty::Options;
+                Options {
+                    #option_fields
+                    ..#ty::DEFAULT_OPTIONS
+                }
+            };
+            inputs.push_str(&#ty::as_html(
                 options,
                 "(value => handleChange('slider', value))")
             );
@@ -164,22 +161,22 @@ fn html<'a>(fields: &[Field<'a>]) -> TokenStream {
         #(#fields_as_html)*
 
         format!(
-            r#"
-            <!DOCTYPE html>
-            <html>
-            <head></head>
-            <body>
-                <script>
-                    function handleChange(field, data) {{
-                        let body = field + ':' + data;
-                        return fetch("", {{ method: "PUT", body }});
-                    }}
-                </script>
-                <div>
-                {inputs}
-                </div>
-            </body>
-            </html>"#,
+r#"
+<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+    <script>
+        function handleChange(field, data) {{
+            let body = field + ':' + data;
+            return fetch("", {{ method: "PUT", body }});
+        }}
+    </script>
+    <div>
+    {inputs}
+    </div>
+</body>
+</html>"#,
             inputs=inputs
         )
     }
