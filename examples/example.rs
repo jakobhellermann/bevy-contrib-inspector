@@ -1,18 +1,38 @@
 use bevy::prelude::*;
-use bevy_inspector::InspectorPlugin;
+use bevy_inspector::{Inspectable, InspectorPlugin};
+
+#[derive(Default)]
+struct Data {
+    slider: u8,
+}
+impl Inspectable for Data {
+    fn update(&mut self, field: &str, value: String) {
+        match field {
+            "slider" => match value.parse() {
+                Ok(val) => self.slider = val,
+                Err(e) => eprintln!("failed to parse 'slider' value '{}': {}", value, e),
+            },
+            _ => eprintln!("unexpected field '{}'", field),
+        }
+    }
+
+    fn html() -> std::borrow::Cow<'static, str> {
+        include_str!("../index.html").into()
+    }
+}
 
 fn main() {
     App::build()
         .add_default_plugins()
-        .add_plugin(InspectorPlugin)
+        .add_plugin(InspectorPlugin::<Data>::new())
         .add_startup_system(setup.system())
         .add_system(text_update_system.system())
         .run();
 }
 
-fn text_update_system(time: Res<Time>, mut query: Query<&mut Text>) {
+fn text_update_system(data: Res<Data>, mut query: Query<&mut Text>) {
     for mut text in &mut query.iter() {
-        text.value = format!("time: {:.2}", time.seconds_since_startup);
+        text.value = format!("time: {}", data.slider);
     }
 }
 
