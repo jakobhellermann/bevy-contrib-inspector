@@ -1,24 +1,10 @@
 use bevy::prelude::*;
 use bevy_inspector::{Inspectable, InspectorPlugin};
 
-#[derive(Default)]
+#[derive(Inspectable, Default)]
+#[inspectable(port = 1234)]
 struct Data {
     slider: u8,
-}
-impl Inspectable for Data {
-    fn update(&mut self, field: &str, value: String) {
-        match field {
-            "slider" => match value.parse() {
-                Ok(val) => self.slider = val,
-                Err(e) => eprintln!("failed to parse 'slider' value '{}': {}", value, e),
-            },
-            _ => eprintln!("unexpected field '{}'", field),
-        }
-    }
-
-    fn html() -> std::borrow::Cow<'static, str> {
-        include_str!("../index.html").into()
-    }
 }
 
 fn main() {

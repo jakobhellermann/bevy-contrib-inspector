@@ -65,10 +65,10 @@ fn parse_body(req: &mut Request) -> Result<Option<(String, String)>, std::io::Er
 }
 
 impl InspectorServer {
-    pub fn start_in_background(addr: &str, config: ServerConfig) -> Result<Self, Error> {
+    pub fn start_in_background(port: u16, config: ServerConfig) -> Result<Self, Error> {
         let (tx, rx) = channel();
 
-        let listener = Server::http(addr)?;
+        let listener = Server::http(("localhost", port))?;
 
         let handle = std::thread::spawn(move || {
             for req in listener.incoming_requests() {

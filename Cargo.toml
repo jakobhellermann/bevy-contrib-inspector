@@ -9,5 +9,7 @@ bevy = "0.1"
 crossbeam-channel = "0.4.3"
 tiny_http = "0.7.0"
 
+bevy-inspector-derive = { path = "./bevy-inspector-derive" }
+
 [profile.dev.package."*"]
 opt-level = 2

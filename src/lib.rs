@@ -3,10 +3,23 @@ use bevy::prelude::*;
 
 use inspector_server::{InspectorServer, ServerConfig};
 
+pub use bevy_inspector_derive::Inspectable;
+
+pub struct InspectableOptions {
+    pub port: u16,
+}
+impl Default for InspectableOptions {
+    fn default() -> Self {
+        InspectableOptions { port: 8668 }
+    }
+}
+
 pub trait Inspectable: Send + Sync + 'static {
     fn html() -> std::borrow::Cow<'static, str>;
-
     fn update(&mut self, field: &str, value: String);
+    fn options() -> InspectableOptions {
+        InspectableOptions::default()
+    }
 }
 
 #[derive(Default, Clone)]
@@ -31,7 +44,8 @@ impl<T: Inspectable> InspectorPlugin<T> {
     fn start_server(mut commands: Commands) {
         let config = ServerConfig::new(T::html());
 
-        let server = InspectorServer::start_in_background("localhost:9121", config).unwrap();
+        let options = T::options();
+        let server = InspectorServer::start_in_background(options.port, config).unwrap();
         commands.insert_resource(server);
     }
 }
