@@ -4,8 +4,10 @@ use bevy_inspector::{Inspectable, InspectorPlugin};
 #[derive(Inspectable, Default)]
 #[inspectable(port = 8668)]
 struct Data {
-    #[inspectable(min = 8, max = 32, default = 16)]
-    slider: u64,
+    #[inspectable(min = 10.0, max = 70.0, default = 50.0)]
+    font_size: f32,
+    text: String,
+    black: bool,
 }
 
 fn main() {
@@ -19,7 +21,13 @@ fn main() {
 
 fn text_update_system(data: Res<Data>, mut query: Query<&mut Text>) {
     for mut text in &mut query.iter() {
-        text.value = format!("time: {}", data.slider);
+        text.value = format!("Text: {}", data.text);
+        text.style.color = if data.black {
+            Color::BLACK
+        } else {
+            Color::WHITE
+        };
+        text.style.font_size = data.font_size;
     }
 }
 
@@ -28,7 +36,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         .load("/usr/share/fonts/truetype/noto/NotoMono-Regular.ttf")
         .unwrap();
 
-    let text = "Test";
+    let text = "Text:";
 
     commands
         .spawn(UiCameraComponents::default())
@@ -41,7 +49,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 value: text.to_string(),
                 font: font_handle,
                 style: TextStyle {
-                    font_size: 60.0,
+                    font_size: 50.0,
                     color: Color::WHITE,
                 },
                 ..Default::default()

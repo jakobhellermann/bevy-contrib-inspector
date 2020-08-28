@@ -1,3 +1,4 @@
+mod html_impls;
 mod inspector_server;
 mod plugin;
 
@@ -27,32 +28,4 @@ pub trait AsHtml: Sized {
 
     fn as_html(options: Self::Options, submit_fn: &'static str) -> String;
     fn parse(value: &str) -> Result<Self, ()>;
-}
-
-pub struct NumberAttributes<T> {
-    pub min: T,
-    pub max: T,
-    pub default: T,
-}
-
-impl AsHtml for u64 {
-    type Options = NumberAttributes<Self>;
-    const DEFAULT_OPTIONS: Self::Options = NumberAttributes {
-        min: 0,
-        max: 100,
-        default: 50,
-    };
-
-    fn as_html(options: Self::Options, submit_fn: &'static str) -> String {
-        format!(
-            r#"
-        <input type="range" min="{}" max="{}" value="{}" oninput="{}(this.value)">
-        "#,
-            options.min, options.max, options.default, submit_fn
-        )
-    }
-
-    fn parse(value: &str) -> Result<Self, ()> {
-        value.parse().map_err(drop)
-    }
 }

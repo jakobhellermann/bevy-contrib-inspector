@@ -37,7 +37,24 @@ pub fn derive_answer_fn(input: proc_macro::TokenStream) -> proc_macro::TokenStre
     expand(derive_data).into()
 }
 
-fn struct_fields_from_attrs(attrs: &[syn::Attribute]) -> TokenStream {
+enum AttrFieldMode {
+    StructInitializer,
+    SetOnStruct(TokenStream),
+}
+/// from `#[inspectable(min = 8, max = 32, default = 16)]`,
+/// generate either
+/// ```rust,ignore
+/// min: 8,
+/// max: 32,
+/// default: 16,
+/// ```
+/// or
+/// ```rust,ignore
+/// #struct.min = 8;
+/// #struct.max = 32;
+/// #struct.default = 16;
+/// ```
+fn struct_fields_from_attrs(attrs: &[syn::Attribute], mode: AttrFieldMode) -> TokenStream {
     let values = attrs
         .iter()
         .filter_map(|attr| attr.parse_meta().ok())
@@ -64,12 +81,15 @@ fn struct_fields_from_attrs(attrs: &[syn::Attribute]) -> TokenStream {
             None => panic!("unexpected path: {:?}", name_value.path),
             Some(ident) => {
                 let lit = &name_value.lit;
-                quote! { #ident: #lit }
+                match &mode {
+                    AttrFieldMode::StructInitializer => quote! { #ident: #lit, },
+                    AttrFieldMode::SetOnStruct(name) => quote! { #name.#ident = #lit; },
+                }
             }
         });
 
     quote! {
-        #(#values,)*
+        #(#values)*
     }
 }
 
@@ -92,7 +112,7 @@ fn expand(data: DeriveData) -> TokenStream {
         attrs,
     } = data;
 
-    let inspectable_fields = struct_fields_from_attrs(&attrs);
+    let inspectable_fields = struct_fields_from_attrs(&attrs, AttrFieldMode::StructInitializer);
     let inspectable_options = quote! {
         bevy_inspector::InspectableOptions {
             #inspectable_fields
@@ -107,7 +127,7 @@ fn expand(data: DeriveData) -> TokenStream {
         quote! {
             #ident_str => match value.parse() {
                 Ok(val) => self.#ident = val,
-                Err(e) => eprintln!("oops"),
+                Err(e) => eprintln!("failed to parse '{}': {}", #ident_str, e),
             }
         }
     });
@@ -138,21 +158,16 @@ fn html<'a>(fields: &[Field<'a>]) -> TokenStream {
     let fields_as_html = fields.iter().map(|field| {
         let ty = &field.ty;
         let attrs = &field.attrs;
+        let ident_str = field.ident.to_string();
 
-        let ty = quote! { <#ty as bevy_inspector::AsHtml> };
-        let option_fields = struct_fields_from_attrs(&attrs);
+        let as_html = quote! { <#ty as bevy_inspector::AsHtml> };
+        let option_fields =
+            struct_fields_from_attrs(&attrs, AttrFieldMode::SetOnStruct(quote! { options }));
         quote! {
-            let options = {
-                type Options = #ty::Options;
-                Options {
-                    #option_fields
-                    ..#ty::DEFAULT_OPTIONS
-                }
-            };
-            inputs.push_str(&#ty::as_html(
-                options,
-                "(value => handleChange('slider', value))")
-            );
+            let mut options = #as_html::DEFAULT_OPTIONS;
+            #option_fields
+            let submit_fn = concat!("(value => handleChange('", #ident_str, "', value))");
+            inputs.push_str(&#as_html::as_html(options, &submit_fn));
         }
     });
 
