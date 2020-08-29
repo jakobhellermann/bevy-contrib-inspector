@@ -26,9 +26,29 @@ impl<T: Inspectable> InspectorPlugin<T> {
         let config = ServerConfig::new(T::html());
 
         let options = T::options();
-        let server = InspectorServer::start_in_background(options.port, config).unwrap();
+
+        let addr = format!("localhost:{}", options.port);
+        let server = InspectorServer::start_in_background(&addr, config).unwrap();
+
+        if should_open_browser() {
+            if let Err(e) = webbrowser::open(&format!("http://{}", addr)) {
+                eprintln!("failed to open {}: {}", addr, e);
+            }
+        }
+
         commands.insert_resource(server);
     }
+}
+
+fn should_open_browser() -> bool {
+    std::env::var("BEVY_INSPECTOR_OPEN").map_or(false, |var| match var.as_str() {
+        "1" | "true" | "yes" | "y" => true,
+        "0" | "false" | "no" | "n" => true,
+        other => {
+            eprintln!("unexpected value for BEVY_INSPECTOR_OPEN: {}", other);
+            false
+        }
+    })
 }
 
 impl<T: Inspectable + Default> Plugin for InspectorPlugin<T> {
