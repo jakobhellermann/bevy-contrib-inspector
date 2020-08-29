@@ -158,16 +158,24 @@ fn html<'a>(fields: &[Field<'a>]) -> TokenStream {
     let fields_as_html = fields.iter().map(|field| {
         let ty = &field.ty;
         let attrs = &field.attrs;
-        let ident_str = field.ident.to_string();
+        let ident = &field.ident;
+        let ident_str = ident.to_string();
 
-        let as_html = quote! { <#ty as bevy_inspector::AsHtml> };
+        let as_html = quote! { <#ty as bevy_inspector::as_html::AsHtml> };
         let option_fields =
             struct_fields_from_attrs(&attrs, AttrFieldMode::SetOnStruct(quote! { options }));
         quote! {
+            let shared = bevy_inspector::as_html::SharedOptions {
+                label: std::borrow::Cow::Borrowed(#ident_str),
+                default: defaults.#ident,
+            };
+
             let mut options = #as_html::DEFAULT_OPTIONS;
             #option_fields
+
             let submit_fn = concat!("(value => handleChange('", #ident_str, "', value))");
-            inputs.push_str(&#as_html::as_html(#ident_str, options, &submit_fn));
+
+            inputs.push_str(&#as_html::as_html(shared, options, &submit_fn));
         }
     });
 
@@ -176,6 +184,8 @@ fn html<'a>(fields: &[Field<'a>]) -> TokenStream {
 
     quote! {
         let mut inputs = String::new();
+
+        let defaults = Self::default();
         #(#fields_as_html)*
 
         format!(

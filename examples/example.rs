@@ -1,13 +1,22 @@
 use bevy::prelude::*;
 use bevy_inspector::{Inspectable, InspectorPlugin};
 
-#[derive(Inspectable, Default)]
+#[derive(Inspectable)]
 #[inspectable(port = 8668)]
 struct Data {
-    #[inspectable(min = 10.0, max = 70.0, default = 50.0)]
+    #[inspectable(min = 10.0, max = 70.0)]
     font_size: f32,
     text: String,
     black: bool,
+}
+impl Default for Data {
+    fn default() -> Self {
+        Data {
+            font_size: 50.0,
+            text: "Hello World!".to_string(),
+            black: false,
+        }
+    }
 }
 
 fn main() {

@@ -22,10 +22,23 @@ impl Default for InspectableOptions {
     }
 }
 
-pub trait AsHtml: Sized {
-    type Options;
-    const DEFAULT_OPTIONS: Self::Options;
+pub mod as_html {
+    pub use crate::html_impls::*;
 
-    fn as_html(label: &str, options: Self::Options, submit_fn: &'static str) -> String;
-    fn parse(value: &str) -> Result<Self, ()>;
+    pub struct SharedOptions<T> {
+        pub label: std::borrow::Cow<'static, str>,
+        pub default: T,
+    }
+
+    pub trait AsHtml: Sized {
+        type Options;
+        const DEFAULT_OPTIONS: Self::Options;
+
+        fn as_html(
+            shared: SharedOptions<Self>,
+            options: Self::Options,
+            submit_fn: &'static str,
+        ) -> String;
+        fn parse(value: &str) -> Result<Self, ()>;
+    }
 }
