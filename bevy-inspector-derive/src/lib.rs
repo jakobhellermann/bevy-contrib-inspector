@@ -182,17 +182,31 @@ fn html<'a>(fields: &[Field<'a>]) -> TokenStream {
     let css = include_str!("../static/style.css");
     let js = include_str!("../static/script.js");
 
-    quote! {
-        let mut inputs = String::new();
+    let tys = fields.iter().map(|field| &field.ty);
 
+    quote! {
+        let mut header = String::new();
+        let mut footer = String::new();
+        let mut field_types = std::collections::HashSet::new();
+
+        #(
+        if field_types.insert(std::any::TypeId::of::<#tys>()) {
+            header.push_str(<#tys as bevy_inspector::as_html::AsHtml>::header());
+            footer.push_str(<#tys as bevy_inspector::as_html::AsHtml>::footer());
+        }
+        )*
+
+        let mut inputs = String::new();
         let defaults = Self::default();
         #(#fields_as_html)*
+
 
         format!(
 r#"
 <!DOCTYPE html>
 <html>
 <head>
+{header}
 <style>{css}</style>
 </head>
 <body>
@@ -202,8 +216,12 @@ r#"
     <div id="inputs">
     {inputs}
     </div>
+
+    {footer}
 </body>
 </html>"#,
+            header=header,
+            footer=footer,
             css=#css,
             js=#js,
             inputs=inputs

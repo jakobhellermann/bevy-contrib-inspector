@@ -11,11 +11,25 @@ macro_rules! impl_ashtml_for_int {
             type Options = NumberAttributes<Self>;
             const DEFAULT_OPTIONS: Self::Options = $default_options;
 
+            fn header() -> &'static str {
+                concat!(
+                    "<script>",
+                    r#"var Numscrubber={};Numscrubber.init=function(){for(var a=document.querySelectorAll("input"),b=0;b<a.length;b++)if("number"==a[b].type&&null!==a[b].getAttribute("data-numscrubber")){a[b].readOnly=!0,a[b].setAttribute("style","-moz-appearance: textfield");var c=document.createElement("span");document.body.appendChild(c),a[b].parentElement.replaceChild(c,a[b]),c.style.position="relative",c.appendChild(a[b]),c.style.width=a[b].offsetWidth+"px",c.style.height=a[b].offsetHeight+"px";var d=document.createElement("input");d.setAttribute("type","range"),c.appendChild(d),""!=a[b].getAttribute("disabled")&&1!=a[b].getAttribute("disabled")||d.setAttribute("disabled",!0),d.setAttribute("step",a[b].getAttribute("step")),d.value=a[b].value,d.min=a[b].min,d.max=a[b].max;var e=a[b].currentStyle||window.getComputedStyle(a[b]);d.style.position="absolute",d.style.margin=e.margin,d.style.left=0,d.style.border="1px solid transparent",d.style.opacity=0,d.style.cursor="e-resize",d.style.width=a[b].offsetWidth+"px",d.style.height=a[b].offsetHeight+"px",function(b){d.addEventListener("input",function(){a[b].value=this.value;var c=new Event("input");a[b].dispatchEvent(c)})}(b)}};"#,
+                    "</script>")
+            }
+            fn footer() -> &'static str {
+                "<script>Numscrubber.init()</script>"
+            }
+
             fn as_html(shared_options: crate::as_html::SharedOptions<Self>, options: Self::Options, submit_fn: &str) -> String {
                 format!(r#"
             <label>
-            {label}
-            <input type="range" min="{}" max="{}" value="{value}" oninput="{submit}(this.value)">
+            {label}:
+            <input
+                data-numscrubber
+                type="number" min="{}" max="{}" value="{value}"
+                oninput="{submit}(this.value)"
+            >
             </label>"#,
                     options.min, options.max,
                     submit = submit_fn,
@@ -51,7 +65,7 @@ impl AsHtml for String {
         format!(
             r#"
             <label>
-            {label}
+            {label}:
             <input type="text" value="{value}" oninput="{}(this.value)">
             </label>"#,
             submit_fn,
@@ -73,7 +87,7 @@ impl AsHtml for bool {
         format!(
             r#"
             <label>
-            {label}
+            {label}:
             <input type="checkbox" {checked} onchange="{}(this.checked)">
             </label>
             "#,

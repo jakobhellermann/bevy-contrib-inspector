@@ -34,6 +34,13 @@ pub mod as_html {
         type Options;
         const DEFAULT_OPTIONS: Self::Options;
 
+        fn header() -> &'static str {
+            ""
+        }
+        fn footer() -> &'static str {
+            ""
+        }
+
         fn as_html(
             shared: SharedOptions<Self>,
             options: Self::Options,
