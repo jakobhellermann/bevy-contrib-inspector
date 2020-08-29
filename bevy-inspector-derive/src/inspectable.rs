@@ -81,7 +81,7 @@ impl<'a> DeriveData<'a> {
             impl bevy_inspector::Inspectable for #ident {
                 fn update(&mut self, field: &str, value: &str) {
                     match field {
-                        #(#match_arms)*,
+                        #(#match_arms,)*
                         _ => eprintln!("unexpected field '{}'", field),
                     }
                 }
@@ -131,7 +131,7 @@ fn html<'a>(fields: &[Field<'a>]) -> TokenStream {
     quote! {
         let mut header = String::new();
         let mut footer = String::new();
-        let mut field_types = std::collections::HashSet::new();
+        let mut field_types = std::collections::HashSet::<std::any::TypeId>::new();
 
         #(
         if field_types.insert(std::any::TypeId::of::<#tys>()) {
@@ -141,7 +141,7 @@ fn html<'a>(fields: &[Field<'a>]) -> TokenStream {
         )*
 
         let mut inputs = String::new();
-        let defaults = Self::default();
+        let defaults = <Self as std::default::Default>::default();
         #(#fields_as_html)*
 
 
