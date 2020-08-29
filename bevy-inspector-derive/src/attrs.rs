@@ -21,7 +21,7 @@ pub enum AttrFieldMode {
 pub fn struct_fields_from_attrs(attrs: &[syn::Attribute], mode: AttrFieldMode) -> TokenStream {
     let values = attrs
         .iter()
-        .filter_map(|attr| attr.parse_meta().ok())
+        .map(|attr| attr.parse_meta().expect("cannot parse attribute meta"))
         .filter(|meta| {
             meta.path()
                 .get_ident()

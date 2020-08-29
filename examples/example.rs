@@ -1,58 +1,11 @@
 use bevy::prelude::*;
-use bevy_inspector::{Inspectable, InspectorPlugin};
+use bevy_inspector::{AsHtml, Inspectable, InspectorPlugin};
 
-#[derive(Debug)]
+#[derive(AsHtml, Debug)]
 enum TextColor {
     White,
     Green,
     Blue,
-}
-impl bevy_inspector::as_html::AsHtml for TextColor {
-    type Err = String;
-    type Options = ();
-    const DEFAULT_OPTIONS: Self::Options = ();
-
-    fn as_html(
-        shared: bevy_inspector::as_html::SharedOptions<Self>,
-        (): Self::Options,
-        submit_fn: &'static str,
-    ) -> String {
-        let mut html = String::new();
-        html.push_str(&format!(
-            r#"
-            <div class="row">
-                <label class="cell text-right">{}:</label>
-                <div class="cell">"#,
-            shared.label,
-        ));
-
-        for field in &["White", "Green", "Blue"] {
-            html.push_str(&format!(
-                r#"
-                <label>
-                    <input type="radio" value="{value}" name="{name}" {checked} oninput="{}(this.value)"/>
-                    {value}
-                </label>
-            "#,
-                submit_fn,
-                value = field,
-                name = shared.label,
-                checked=if format!("{:?}", shared.default) == *field { "checked" } else {""}
-            ));
-        }
-
-        html.push_str(r#"</div></div>"#);
-        html
-    }
-
-    fn parse(value: &str) -> Result<Self, Self::Err> {
-        match value {
-            "White" => Ok(TextColor::White),
-            "Green" => Ok(TextColor::Green),
-            "Blue" => Ok(TextColor::Blue),
-            _ => Err(value.to_string()),
-        }
-    }
 }
 
 #[derive(Inspectable, Debug)]
@@ -86,7 +39,6 @@ fn main() {
 
 fn text_update_system(data: Res<Data>, mut query: Query<&mut Text>) {
     for mut text in &mut query.iter() {
-        dbg!(&*data);
         text.value = format!("Text: {}", data.text);
         text.style.color = match (data.black, &data.text_color) {
             (true, _) => Color::BLACK,

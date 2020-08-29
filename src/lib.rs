@@ -2,7 +2,7 @@ mod html_impls;
 mod inspector_server;
 mod plugin;
 
-pub use bevy_inspector_derive::Inspectable;
+pub use bevy_inspector_derive::{AsHtml, Inspectable};
 pub use plugin::InspectorPlugin;
 
 pub trait Inspectable: Send + Sync + 'static {
