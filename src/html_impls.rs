@@ -3,6 +3,7 @@ use crate::{as_html::AsHtml, as_html::SharedOptions};
 pub struct NumberAttributes<T> {
     pub min: T,
     pub max: T,
+    pub step: T,
 }
 
 macro_rules! impl_ashtml_for_int {
@@ -25,10 +26,10 @@ macro_rules! impl_ashtml_for_int {
                 format!(r#"
             <div class="row">
                 <label for="{label}" class="cell text-right">{label}:</label>
-                <input class="cell" data-numscrubber type="number" min="{}" max="{}" value="{value}" oninput="{}(this.value) id="{label}">
+                <input class="cell" data-numscrubber type="number" min="{}" max="{}" step="{}" value="{value}" oninput="{}(this.value) id="{label}">
             </div>
             "#,
-                    options.min, options.max,
+                    options.min, options.max, options.step,
                     submit = submit_fn,
                     value = shared_options.default,
                     label = shared_options.label,
@@ -46,13 +47,13 @@ macro_rules! impl_ashtml_for_int {
     }
 }
 
-impl_ashtml_for_int!(u8 => NumberAttributes { min: std::u8::MIN, max: std::u8::MAX });
-impl_ashtml_for_int!(i8 => NumberAttributes { min: std::i8::MIN, max: std::i8::MAX });
+impl_ashtml_for_int!(u8 => NumberAttributes { min: std::u8::MIN, max: std::u8::MAX, step: 1 });
+impl_ashtml_for_int!(i8 => NumberAttributes { min: std::i8::MIN, max: std::i8::MAX, step: 1 });
 
-impl_ashtml_for_int!(u16, u32, u64 => NumberAttributes { min: 0, max: 100 });
-impl_ashtml_for_int!(i16, i32, i64 => NumberAttributes { min: 0, max: 100 });
+impl_ashtml_for_int!(u16, u32, u64 => NumberAttributes { min: 0, max: 100, step: 1 });
+impl_ashtml_for_int!(i16, i32, i64 => NumberAttributes { min: 0, max: 100, step: 1 });
 
-impl_ashtml_for_int!(f32, f64 => NumberAttributes { min: 0.0, max: 1.0 });
+impl_ashtml_for_int!(f32, f64 => NumberAttributes { min: 0.0, max: 1.0, step: 0.01 });
 
 impl AsHtml for String {
     type Options = ();
