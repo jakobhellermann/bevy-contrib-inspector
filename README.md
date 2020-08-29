@@ -1,11 +1,11 @@
-# bevy-inspector
+# bevy-contrib-inspector
 
 This crate provides the ability to annotate structs with a `#[derive(Inspectable)]`,
 which opens a web interface (by default on port 5676) where you can visually edit the values of your struct live.
 
 ## Example
 ```rust
-use bevy_inspector::Inspectable;
+use bevy_contrib_inspector::Inspectable;
 
 #[derive(Inspectable, Default)]
 struct Data {
@@ -17,7 +17,7 @@ struct Data {
 ```
 Add the [`InspectorPlugin`] to your App.
 ```rust,no_run
-use bevy_inspector::InspectorPlugin;
+use bevy_contrib_inspector::InspectorPlugin;
 
 fn main() {
     App::build()

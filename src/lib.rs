@@ -3,7 +3,7 @@
 //!
 //! ## Example
 //! ```rust
-//! use bevy_inspector::Inspectable;
+//! use bevy_contrib_inspector::Inspectable;
 //!
 //! #[derive(Inspectable, Default)]
 //! struct Data {
@@ -15,10 +15,10 @@
 //! ```
 //! Add the [`InspectorPlugin`] to your App.
 //! ```rust,no_run
-//! use bevy_inspector::InspectorPlugin;
+//! use bevy_contrib_inspector::InspectorPlugin;
 //! # use bevy::prelude::*;
 //!
-//! # #[derive(bevy_inspector::Inspectable, Default)] struct Data {}
+//! # #[derive(bevy_contrib_inspector::Inspectable, Default)] struct Data {}
 //! fn main() {
 //!     App::build()
 //!         .add_default_plugins()
@@ -34,15 +34,15 @@
 //! ```rust
 //! # struct O { a: u8, b: u8, c: u8 }
 //! # #[derive(Default)] struct Type {}
-//! # impl bevy_inspector::AsHtml for Type {
+//! # impl bevy_contrib_inspector::AsHtml for Type {
 //! #     type Err = ();
 //! #     type Options = O;
 //! #     const DEFAULT_OPTIONS: Self::Options = O { a: 0, b: 0, c: 0 };
-//! #     fn as_html(_: bevy_inspector::as_html::SharedOptions<Self>, _: Self::Options, _: &'static str) -> String { todo!() }
+//! #     fn as_html(_: bevy_contrib_inspector::as_html::SharedOptions<Self>, _: Self::Options, _: &'static str) -> String { todo!() }
 //! #     fn parse(_: &str) -> Result<Self, Self::Err> { todo!() }
 //! # }
 //! #
-//! # use bevy_inspector::Inspectable;
+//! # use bevy_contrib_inspector::Inspectable;
 //! #[derive(Inspectable, Default)]
 //! #[inspectable(port = 1234)]
 //! struct Data {
@@ -57,9 +57,9 @@ mod inspector_server;
 mod plugin;
 
 /// derives [AsHtml](trait.AsHtml.html)
-pub use bevy_inspector_derive::AsHtml;
+pub use bevy_contrib_inspector_derive::AsHtml;
 /// derives [Inspectable](trait.Inspectable.html)
-pub use bevy_inspector_derive::Inspectable;
+pub use bevy_contrib_inspector_derive::Inspectable;
 
 pub use plugin::InspectorPlugin;
 

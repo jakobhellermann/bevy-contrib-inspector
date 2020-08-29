@@ -41,13 +41,13 @@ impl DeriveData<'_> {
         });
 
         quote! {
-        impl bevy_inspector::as_html::AsHtml for #ident {
+        impl bevy_contrib_inspector::as_html::AsHtml for #ident {
             type Err = String;
             type Options = ();
             const DEFAULT_OPTIONS: Self::Options = ();
 
             fn as_html(
-                shared: bevy_inspector::as_html::SharedOptions<Self>,
+                shared: bevy_contrib_inspector::as_html::SharedOptions<Self>,
                 (): Self::Options,
                 submit_fn: &'static str,
             ) -> String {

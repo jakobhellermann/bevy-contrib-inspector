@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_inspector::{AsHtml, Inspectable, InspectorPlugin};
+use bevy_contrib_inspector::{AsHtml, Inspectable, InspectorPlugin};
 
 #[derive(AsHtml, Debug)]
 enum TextColor {

@@ -56,7 +56,7 @@ impl<'a> DeriveData<'a> {
 
         let inspectable_fields = struct_fields_from_attrs(&attrs, AttrFieldMode::StructInitializer);
         let inspectable_options = quote! {
-            bevy_inspector::InspectableOptions {
+            bevy_contrib_inspector::InspectableOptions {
                 #inspectable_fields
                 ..Default::default()
             }
@@ -68,7 +68,7 @@ impl<'a> DeriveData<'a> {
             let ty = &field.ty;
 
             quote! {
-                #ident_str => match <#ty as bevy_inspector::as_html::AsHtml>::parse(&value) {
+                #ident_str => match <#ty as bevy_contrib_inspector::as_html::AsHtml>::parse(&value) {
                     Ok(val) => self.#ident = val,
                     Err(e) => eprintln!("failed to parse '{}': {:?}", #ident_str, e),
                 }
@@ -78,7 +78,7 @@ impl<'a> DeriveData<'a> {
         let html = html(&fields);
 
         quote! {
-            impl bevy_inspector::Inspectable for #ident {
+            impl bevy_contrib_inspector::Inspectable for #ident {
                 fn update(&mut self, field: &str, value: &str) {
                     match field {
                         #(#match_arms,)*
@@ -90,7 +90,7 @@ impl<'a> DeriveData<'a> {
                     #html
                 }
 
-                fn options() -> bevy_inspector::InspectableOptions {
+                fn options() -> bevy_contrib_inspector::InspectableOptions {
                     #inspectable_options
                 }
             }
@@ -105,11 +105,11 @@ fn html<'a>(fields: &[Field<'a>]) -> TokenStream {
         let ident = &field.ident;
         let ident_str = ident.to_string();
 
-        let as_html = quote! { <#ty as bevy_inspector::as_html::AsHtml> };
+        let as_html = quote! { <#ty as bevy_contrib_inspector::as_html::AsHtml> };
         let option_fields =
             struct_fields_from_attrs(&attrs, AttrFieldMode::SetOnStruct(quote! { options }));
         quote! {
-            let shared = bevy_inspector::as_html::SharedOptions {
+            let shared = bevy_contrib_inspector::as_html::SharedOptions {
                 label: std::borrow::Cow::Borrowed(#ident_str),
                 default: defaults.#ident,
             };
@@ -135,8 +135,8 @@ fn html<'a>(fields: &[Field<'a>]) -> TokenStream {
 
         #(
         if field_types.insert(std::any::TypeId::of::<#tys>()) {
-            header.push_str(<#tys as bevy_inspector::as_html::AsHtml>::header());
-            footer.push_str(<#tys as bevy_inspector::as_html::AsHtml>::footer());
+            header.push_str(<#tys as bevy_contrib_inspector::as_html::AsHtml>::header());
+            footer.push_str(<#tys as bevy_contrib_inspector::as_html::AsHtml>::footer());
         }
         )*
 
