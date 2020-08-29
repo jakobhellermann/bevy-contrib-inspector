@@ -213,6 +213,7 @@ r#"
     <script>
     {js}
     </script>
+
     <div id="inputs">
     {inputs}
     </div>

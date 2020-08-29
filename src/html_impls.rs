@@ -23,14 +23,11 @@ macro_rules! impl_ashtml_for_int {
 
             fn as_html(shared_options: crate::as_html::SharedOptions<Self>, options: Self::Options, submit_fn: &str) -> String {
                 format!(r#"
-            <label>
-            {label}:
-            <input
-                data-numscrubber
-                type="number" min="{}" max="{}" value="{value}"
-                oninput="{submit}(this.value)"
-            >
-            </label>"#,
+            <div class="row">
+                <label for="{label}" class="cell text-right">{label}:</label>
+                <input class="cell" data-numscrubber type="number" min="{}" max="{}" value="{value}" oninput="{}(this.value) id="{label}">
+            </div>
+            "#,
                     options.min, options.max,
                     submit = submit_fn,
                     value = shared_options.default,
@@ -64,10 +61,11 @@ impl AsHtml for String {
     fn as_html(shared: SharedOptions<Self>, (): Self::Options, submit_fn: &str) -> String {
         format!(
             r#"
-            <label>
-            {label}:
-            <input type="text" value="{value}" oninput="{}(this.value)">
-            </label>"#,
+            <div class="row">
+                <label for="{label}" class="cell text-right">{label}:</label>
+                <input class="cell" type="text" value="{value}" oninput="{}(this.value)" id="{label}">
+            </div>
+            "#,
             submit_fn,
             value = shared.default,
             label = shared.label,
@@ -86,10 +84,10 @@ impl AsHtml for bool {
     fn as_html(shared: SharedOptions<Self>, (): Self::Options, submit_fn: &str) -> String {
         format!(
             r#"
-            <label>
-            {label}:
-            <input type="checkbox" {checked} onchange="{}(this.checked)">
-            </label>
+            <div class="row">
+                <label for="{label}" class="cell text-right">{label}:</label>
+                <input class="cell" type="checkbox" {checked} oninput="{}(this.checked)" id="{label}">
+            </div>
             "#,
             submit_fn,
             checked = if shared.default { "checked" } else { "" },

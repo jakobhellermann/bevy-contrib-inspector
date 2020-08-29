@@ -1,9 +1,22 @@
-#inputs {
+body {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: center;
+    margin-top: 2rem;
 }
 
-#inputs>* {
-    margin-bottom: 1rem;
+#inputs {
+    display: table;
+    border-spacing: 0.25rem 0.5rem;
+}
+
+.row {
+    display: table-row;
+}
+
+.cell {
+    display: table-cell;
+}
+
+.text-right {
+    text-align: right;
 }
