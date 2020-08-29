@@ -18,7 +18,7 @@ impl<T> InspectorPlugin<T> {
 impl<T: Inspectable> InspectorPlugin<T> {
     fn check(server: Res<InspectorServer>, mut inspectable_data: ResMut<T>) {
         if let Ok((field, data)) = server.rx.try_recv() {
-            inspectable_data.update(&field, data);
+            inspectable_data.update(&field, &data);
         }
     }
 

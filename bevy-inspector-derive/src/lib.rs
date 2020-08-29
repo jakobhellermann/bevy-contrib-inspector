@@ -123,11 +123,12 @@ fn expand(data: DeriveData) -> TokenStream {
     let match_arms = fields.iter().map(|field| {
         let ident = field.ident;
         let ident_str = ident.to_string();
+        let ty = &field.ty;
 
         quote! {
-            #ident_str => match value.parse() {
+            #ident_str => match <#ty as bevy_inspector::as_html::AsHtml>::parse(&value) {
                 Ok(val) => self.#ident = val,
-                Err(e) => eprintln!("failed to parse '{}': {}", #ident_str, e),
+                Err(e) => eprintln!("failed to parse '{}': {:?}", #ident_str, e),
             }
         }
     });
@@ -136,7 +137,7 @@ fn expand(data: DeriveData) -> TokenStream {
 
     quote! {
         impl bevy_inspector::Inspectable for #ident {
-            fn update(&mut self, field: &str, value: String) {
+            fn update(&mut self, field: &str, value: &str) {
                 match field {
                     #(#match_arms)*,
                     _ => eprintln!("unexpected field '{}'", field),

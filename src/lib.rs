@@ -7,7 +7,7 @@ pub use plugin::InspectorPlugin;
 
 pub trait Inspectable: Send + Sync + 'static {
     fn html() -> String;
-    fn update(&mut self, field: &str, value: String);
+    fn update(&mut self, field: &str, value: &str);
     fn options() -> InspectableOptions {
         InspectableOptions::default()
     }
@@ -31,6 +31,7 @@ pub mod as_html {
     }
 
     pub trait AsHtml: Sized {
+        type Err;
         type Options;
         const DEFAULT_OPTIONS: Self::Options;
 
@@ -46,6 +47,6 @@ pub mod as_html {
             options: Self::Options,
             submit_fn: &'static str,
         ) -> String;
-        fn parse(value: &str) -> Result<Self, ()>;
+        fn parse(value: &str) -> Result<Self, Self::Err>;
     }
 }
