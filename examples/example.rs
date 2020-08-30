@@ -13,16 +13,18 @@ struct Data {
     #[inspectable(min = 10.0, max = 70.0)]
     font_size: f32,
     text: String,
-    black: bool,
+    use_picker_color: bool,
     text_color: TextColor,
+    picker_color: Color,
 }
 impl Default for Data {
     fn default() -> Self {
         Data {
             font_size: 50.0,
             text: "Hello World!".to_string(),
-            black: false,
+            use_picker_color: false,
             text_color: TextColor::White,
+            picker_color: Color::BLACK,
         }
     }
 }
@@ -39,11 +41,14 @@ fn main() {
 fn text_update_system(data: Res<Data>, mut query: Query<&mut Text>) {
     for mut text in &mut query.iter() {
         text.value = format!("Text: {}", data.text);
-        text.style.color = match (data.black, &data.text_color) {
-            (true, _) => Color::BLACK,
-            (false, TextColor::White) => Color::WHITE,
-            (false, TextColor::Green) => Color::GREEN,
-            (false, TextColor::Blue) => Color::BLUE,
+        text.style.color = if data.use_picker_color {
+            data.picker_color
+        } else {
+            match &data.text_color {
+                TextColor::White => Color::WHITE,
+                TextColor::Green => Color::GREEN,
+                TextColor::Blue => Color::BLUE,
+            }
         };
         text.style.font_size = data.font_size;
     }

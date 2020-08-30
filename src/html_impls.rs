@@ -1,4 +1,5 @@
 use crate::{as_html::AsHtml, as_html::SharedOptions};
+use bevy::prelude::*;
 
 pub struct NumberAttributes<T> {
     pub min: T,
@@ -101,5 +102,53 @@ impl AsHtml for bool {
 
     fn parse(value: &str) -> Result<Self, Self::Err> {
         value.parse()
+    }
+}
+
+fn color_to_string(c: &Color) -> String {
+    use std::fmt::Write;
+
+    let mut s = String::with_capacity(6);
+    s.push('#');
+    write!(s, "{:02x}", (c.r * 255.0) as u8).unwrap();
+    write!(s, "{:02x}", (c.g * 255.0) as u8).unwrap();
+    write!(s, "{:02x}", (c.b * 255.0) as u8).unwrap();
+    s
+}
+fn string_to_color(s: &str) -> Result<Color, ()> {
+    if !s.starts_with('#') || !s.len() == 7 {
+        return Err(());
+    }
+
+    let r = u8::from_str_radix(&s[1..=2], 16).map_err(drop)?;
+    let g = u8::from_str_radix(&s[3..=4], 16).map_err(drop)?;
+    let b = u8::from_str_radix(&s[5..=6], 16).map_err(drop)?;
+
+    let r = r as f32 / 255.0;
+    let g = g as f32 / 255.0;
+    let b = b as f32 / 255.0;
+
+    Ok(Color::rgb(r, g, b))
+}
+impl AsHtml for Color {
+    type Err = ();
+    type Options = ();
+
+    const DEFAULT_OPTIONS: Self::Options = ();
+
+    fn as_html(shared: SharedOptions<Self>, (): Self::Options, submit_fn: &'static str) -> String {
+        format!(
+            r#"<div class="row">
+                <label for="{label}" class="cell text-right">{label}:</label>
+                <input class="cell" type="color" value={default} oninput="{}(this.value)" id="{label}">
+            </div>"#,
+            submit_fn,
+            label = shared.label,
+            default = color_to_string(&shared.default),
+        )
+    }
+
+    fn parse(value: &str) -> Result<Self, Self::Err> {
+        string_to_color(value)
     }
 }
