@@ -152,3 +152,65 @@ impl AsHtml for Color {
         string_to_color(value)
     }
 }
+
+/*struct Vec2Attributes {
+    min: Vec2,
+    max: Vec2,
+}*/
+impl AsHtml for Vec2 {
+    type Err = ();
+    /*type Options = Vec2Attributes;
+    const DEFAULT_OPTIONS: Self::Options = Vec2Attributes {
+        min: Vec2::new(-1.0, 1.0),
+        max: Vec2::new(-1.0, 1.0),
+    };*/
+    type Options = ();
+    const DEFAULT_OPTIONS: Self::Options = ();
+
+    fn as_html(shared: SharedOptions<Self>, (): Self::Options, submit_fn: &'static str) -> String {
+        format!(
+            r#"
+        <div class="row">
+            <label class="cell text-right" style="vertical-align: middle;">{label}:</label>
+            <div class="cell">
+                <div style="display: flex; flex-direction: column-reverse; align-items: center">
+                    <code id="{label}-output">({default_x}, {default_y})</code>
+                    <canvas data-vec2d data-vec2d-default-x={default_x} data-vec2d-default-y={default_y} width="200" height="200" id="{label}" style="width: 10rem; height: 10rem; border: 1px solid #000" />
+                </div>
+            </div>
+        </div>
+        <script>
+            let {label}Output = document.getElementById("{label}-output");
+            document.getElementById("{label}").addEventListener("vec2d-data", (e) => {{
+                const {{ x, y }} = e.detail;
+                {label}Output.textContent = '(' + x.toFixed(2) + ', ' + y.toFixed(2) + ')';
+                {submit_fn}(x.toString() + ',' + y.toString());
+            }});
+        </script>
+        "#,
+            default_x = shared.default.x(),
+            default_y = shared.default.y(),
+            submit_fn = submit_fn,
+            label = shared.label,
+        )
+    }
+
+    fn footer() -> &'static str {
+        concat!(
+            "<script>",
+            include_str!("../static/vec2d_ashtml.js"),
+            "</script>"
+        )
+    }
+
+    fn parse(value: &str) -> Result<Self, Self::Err> {
+        let mut iter = value.splitn(2, ',');
+        let x = iter.next().ok_or(())?;
+        let y = iter.next().ok_or(())?;
+
+        let x = x.parse().map_err(drop)?;
+        let y = y.parse().map_err(drop)?;
+
+        Ok(Vec2::new(x, y))
+    }
+}
