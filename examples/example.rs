@@ -66,8 +66,8 @@ fn shape_update_system(
         if !data.show_square {
             pos.0.set_x(1000000.0)
         } else {
-            pos.0.set_x(data.position.x() * 200.0);
-            pos.0.set_y(data.position.y() * 200.0);
+            pos.0.set_x(data.position.x());
+            pos.0.set_y(data.position.y());
         }
     }
 }

@@ -43,7 +43,7 @@ impl<T: Inspectable> InspectorPlugin<T> {
 fn should_open_browser() -> bool {
     std::env::var("BEVY_INSPECTOR_OPEN").map_or(false, |var| match var.as_str() {
         "1" | "true" | "yes" | "y" => true,
-        "0" | "false" | "no" | "n" => true,
+        "0" | "false" | "no" | "n" => false,
         other => {
             eprintln!("unexpected value for BEVY_INSPECTOR_OPEN: {}", other);
             false

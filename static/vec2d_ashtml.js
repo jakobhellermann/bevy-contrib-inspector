@@ -24,7 +24,6 @@ const ticks = (start, end, step, f) => {
     }
 };
 
-
 for (const canvas of document.getElementsByTagName("canvas")) {
     if (canvas.dataset.vec2d === undefined) continue;
     const defaultValue = parsePoint(canvas.dataset.vec2dDefault);
@@ -125,8 +124,8 @@ for (const canvas of document.getElementsByTagName("canvas")) {
         const y = positionToCanvasY((e.clientY - rect.top) * scaleY);
 
         currentPoints[e.target.id] = { x, y };
-        drawCoordinateSystem();
 
         canvas.dispatchEvent(new CustomEvent("vec2d-data", { detail: { x, y } }));
+        drawCoordinateSystem();
     });
 }

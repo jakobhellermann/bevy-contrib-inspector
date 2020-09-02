@@ -167,7 +167,7 @@ impl AsHtml for Vec2 {
 
     fn as_html(
         shared: SharedOptions<Self>,
-        _options: Self::Options,
+        options: Self::Options,
         submit_fn: &'static str,
     ) -> String {
         format!(
@@ -177,7 +177,14 @@ impl AsHtml for Vec2 {
             <div class="cell">
                 <div style="display: flex; flex-direction: column-reverse; align-items: center">
                     <code id="{label}-output">({default_x}, {default_y})</code>
-                    <canvas data-vec2d data-vec2d-default-x={default_x} data-vec2d-default-y={default_y} width="200" height="200" id="{label}" style="width: 10rem; height: 10rem; border: 1px solid #000" />
+                    <canvas
+                        data-vec2d
+                        data-vec2d-default="{default_x},{default_y}"
+                        data-vec2d-min="{min_x},{min_y}"
+                        data-vec2d-max="{max_x},{max_y}"
+                        width="200" height="200"
+                        id="{label}"
+                        style="width: 10rem; height: 10rem; border: 1px solid #000" />
                 </div>
             </div>
         </div>
@@ -192,6 +199,10 @@ impl AsHtml for Vec2 {
         "#,
             default_x = shared.default.x(),
             default_y = shared.default.y(),
+            min_x = options.min.x(),
+            min_y = options.min.y(),
+            max_x = options.max.x(),
+            max_y = options.max.y(),
             submit_fn = submit_fn,
             label = shared.label,
         )
