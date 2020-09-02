@@ -157,6 +157,7 @@ r#"
 </head>
 <body>
     <script>
+    const handleChangeThrottle = {inspectable_throttle};
     {js}
     </script>
 
@@ -171,7 +172,8 @@ r#"
             footer=footer,
             css=#css,
             js=#js,
-            inputs=inputs
+            inputs=inputs,
+            inspectable_throttle=10, // used in ../static/script.js
         )
     }
 }
