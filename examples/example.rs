@@ -16,6 +16,7 @@ struct Data {
     show_square: bool,
     text_color: TextColor,
     color: Color,
+    #[inspectable(min = Vec2::new(-200., -200.), max = Vec2::new(200., 200.))]
     position: Vec2,
 }
 impl Default for Data {

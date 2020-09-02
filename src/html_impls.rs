@@ -153,21 +153,23 @@ impl AsHtml for Color {
     }
 }
 
-/*struct Vec2Attributes {
-    min: Vec2,
-    max: Vec2,
-}*/
+pub struct Vec2Attributes {
+    pub min: Vec2,
+    pub max: Vec2,
+}
 impl AsHtml for Vec2 {
     type Err = ();
-    /*type Options = Vec2Attributes;
+    type Options = Vec2Attributes;
     const DEFAULT_OPTIONS: Self::Options = Vec2Attributes {
-        min: Vec2::new(-1.0, 1.0),
-        max: Vec2::new(-1.0, 1.0),
-    };*/
-    type Options = ();
-    const DEFAULT_OPTIONS: Self::Options = ();
+        min: unsafe { std::mem::transmute([-1.0f32, -1.0]) },
+        max: unsafe { std::mem::transmute([-1.0f32, -1.0]) },
+    };
 
-    fn as_html(shared: SharedOptions<Self>, (): Self::Options, submit_fn: &'static str) -> String {
+    fn as_html(
+        shared: SharedOptions<Self>,
+        _options: Self::Options,
+        submit_fn: &'static str,
+    ) -> String {
         format!(
             r#"
         <div class="row">

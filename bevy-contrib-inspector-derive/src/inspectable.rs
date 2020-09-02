@@ -1,5 +1,4 @@
 extern crate proc_macro;
-use crate::attrs::{struct_fields_from_attrs, AttrFieldMode};
 use proc_macro2::TokenStream;
 use quote::quote;
 
@@ -54,10 +53,11 @@ impl<'a> DeriveData<'a> {
             attrs,
         } = self;
 
-        let inspectable_fields = struct_fields_from_attrs(&attrs, AttrFieldMode::StructInitializer);
+        let inspectable_fields = crate::attrs::inspectable_attributes(&attrs)
+            .map(|(left, right)| quote! { #left: #right, });
         let inspectable_options = quote! {
             bevy_contrib_inspector::InspectableOptions {
-                #inspectable_fields
+                #(#inspectable_fields)*
                 ..Default::default()
             }
         };
@@ -106,8 +106,9 @@ fn html<'a>(fields: &[Field<'a>]) -> TokenStream {
         let ident_str = ident.to_string();
 
         let as_html = quote! { <#ty as bevy_contrib_inspector::as_html::AsHtml> };
-        let option_fields =
-            struct_fields_from_attrs(&attrs, AttrFieldMode::SetOnStruct(quote! { options }));
+        let option_fields = crate::attrs::inspectable_attributes(&attrs)
+            .map(|(left, right)| quote! { options.#left = #right; });
+
         quote! {
             let shared = bevy_contrib_inspector::as_html::SharedOptions {
                 label: std::borrow::Cow::Borrowed(#ident_str),
@@ -115,7 +116,7 @@ fn html<'a>(fields: &[Field<'a>]) -> TokenStream {
             };
 
             let mut options = #as_html::DEFAULT_OPTIONS;
-            #option_fields
+            #(#option_fields)*
 
             let submit_fn = concat!("(value => handleChange('", #ident_str, "', value))");
 
