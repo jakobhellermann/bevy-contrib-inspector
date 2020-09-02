@@ -1,30 +1,56 @@
 let currentPoints = {};
 
-console.log(document.getElementsByTagName("canvas"));
+function desiredStep(x) {
+    // 0.1, 1, 10, 100, etc.
+    const nearestExpOf10 = Math.pow(10, Math.floor(Math.log10(x)));
+    const selection = [nearestExpOf10, nearestExpOf10 * 2, nearestExpOf10 * 5, nearestExpOf10 * 10]
+
+    const deltas = selection.map(s => Math.abs(x - s));
+    const closest = Math.min(...deltas);
+    const index = deltas.indexOf(closest);
+
+    return selection[index];
+}
+
+function parsePoint(point) {
+    let [x, y] = point.split(",");
+    return { x: parseFloat(x), y: parseFloat(y) };
+}
+
+const roundTowards = (value, towards) => Math.round(value / towards) * towards;
+const ticks = (start, end, step, f) => {
+    for (value = roundTowards(start, step); value < end; value += step) {
+        f(value);
+    }
+};
+
+
 for (const canvas of document.getElementsByTagName("canvas")) {
     if (canvas.dataset.vec2d === undefined) continue;
+    const defaultValue = parsePoint(canvas.dataset.vec2dDefault);
 
-    currentPoints[canvas.id] = {
-        x: canvas.dataset.vec2dDefaultX,
-        y: canvas.dataset.vec2dDefaultY,
-    };
-    console.log(canvas.dataset)
+    const min = parsePoint(canvas.dataset.vec2dMin);
+    const max = parsePoint(canvas.dataset.vec2dMax);
+    const width = max.x - min.x, height = max.y - min.x;
+
+    currentPoints[canvas.id] = defaultValue;
 
     let ctx = canvas.getContext("2d");
     ctx.font = "1em sans";
 
-    const w = canvas.width;
-    const h = canvas.height;
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
 
-    const left = 0, right = w, top = 0, bottom = h;
+    const left = 0, right = canvasWidth, top = 0, bottom = canvasHeight;
 
-    const canvasX = (x) => ((x - offsetX) + 1) / 2 * w;
-    const canvasY = (y) => (-(y - offsetY) + 1) / 2 * h;
-    const positionToCanvasX = x => ((x / w) * 2) - 1 + offsetX;
-    const positionToCanvasY = y => -((((y) / h) * 2) - 1 - offsetY);
-
-    const offsetX = 0.;
-    const offsetY = 0.;
+    // from [min.x, max.x] to [0, canvasWidth]
+    const canvasX = x => (x - min.x) / (max.x - min.x) * canvasWidth;
+    // from [min.y, max.y] to [canvasHeight, 0]
+    const canvasY = y => (y - max.y) / (min.y - max.y) * canvasHeight;
+    // [0, canvasWidth] to [min.x, max.x]
+    const positionToCanvasX = x => x / canvasWidth * (max.x - min.x) + min.x;
+    // [canvasHeight, 0] to [min.y, max.y]
+    const positionToCanvasY = y => y / canvasHeight * (min.y - max.y) + max.y;
 
     const line = (from, to) => {
         ctx.beginPath();
@@ -40,34 +66,13 @@ for (const canvas of document.getElementsByTagName("canvas")) {
         ctx.arc(x, y, radius, 0, Math.PI * 2, false);
         ctx.fill();
     }
-    const clearCircle = (x, y, radius) => {
-        ctx.save();
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
-        ctx.fill();
-        ctx.restore();
-    };
 
     const drawCoordinateSystem = () => {
-
-        ctx.clearRect(0, 0, w, h);
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
         ctx.lineWidth = 2;
         line([left, canvasY(0)], [right, canvasY(0)]);
         line([canvasX(0), top], [canvasX(0), bottom]);
-
-
-        const roundTowards = (value, towards) => {
-            let inv = 1 / towards;
-            return Math.round(value * inv) / inv;
-        }
-
-        const ticks = (start, end, step, f) => {
-            for (value = roundTowards(start, step); value < end; value += step) {
-                f(value);
-            }
-        };
 
         ctx.lineWidth = 0.5;
         ctx.strokeStyle = "#888";
@@ -75,7 +80,8 @@ for (const canvas of document.getElementsByTagName("canvas")) {
         ctx.textBaseline = "middle";
         ctx.textAlign = "center";
 
-        ticks(positionToCanvasX(left), positionToCanvasX(right), 0.2, (x) => {
+        const tickStepX = desiredStep(width / 10);
+        ticks(positionToCanvasX(left), positionToCanvasX(right), tickStepX, (x) => {
             const cx = canvasX(x);
             line([cx, top], [cx, bottom]);
         });
@@ -83,7 +89,8 @@ for (const canvas of document.getElementsByTagName("canvas")) {
         //     text(x.toString(), canvasX(x), canvasY(-0.2));
         // });
 
-        ticks(positionToCanvasY(bottom), positionToCanvasY(top), 0.2, (y) => {
+        const tickStepY = desiredStep(height / 10);
+        ticks(positionToCanvasY(bottom), positionToCanvasY(top), tickStepY, (y) => {
             const cy = canvasY(y);
             line([left, cy], [right, cy]);
         });
