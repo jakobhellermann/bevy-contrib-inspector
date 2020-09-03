@@ -29,20 +29,36 @@ for (const canvas of document.getElementsByTagName("canvas")) {
     if (canvas.dataset.vec2d === undefined) continue;
     const defaultValue = parsePoint(canvas.dataset.vec2dDefault);
 
-    const min = parsePoint(canvas.dataset.vec2dMin);
-    const max = parsePoint(canvas.dataset.vec2dMax);
-    const width = max.x - min.x, height = max.y - min.x;
+    let min = parsePoint(canvas.dataset.vec2dMin);
+    let max = parsePoint(canvas.dataset.vec2dMax);
+
+    const width = () => max.x - min.x;
+    const height = () => max.y - min.x;
 
     currentPoints[canvas.id] = defaultValue;
 
     let ctx = canvas.getContext("2d");
     ctx.font = "0.8em sans";
+    const line = (from, to) => {
+        ctx.beginPath();
+        ctx.moveTo(from[0], from[1]);
+        ctx.lineTo(to[0], to[1]);
+        ctx.stroke();
+    }
+    const text = (text, x, y) => {
+        ctx.fillText(text, x, y);
+    }
+    const circle = (x, y, radius) => {
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2, false);
+        ctx.fill();
+    }
 
     const canvasWidth = canvas.width;
     const canvasHeight = canvas.height;
 
-    const canvasScaleX = canvasWidth / width;
-    const canvasScaleY = canvasHeight / height;
+    const canvasScaleX = () => canvasWidth / width();
+    const canvasScaleY = () => canvasHeight / height();
 
     const left = 0, right = canvasWidth, top = 0, bottom = canvasHeight;
 
@@ -75,21 +91,6 @@ for (const canvas of document.getElementsByTagName("canvas")) {
         return { x, y }
     }
 
-    const line = (from, to) => {
-        ctx.beginPath();
-        ctx.moveTo(from[0], from[1]);
-        ctx.lineTo(to[0], to[1]);
-        ctx.stroke();
-    }
-    const text = (text, x, y) => {
-        ctx.fillText(text, x, y);
-    }
-    const circle = (x, y, radius) => {
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2, false);
-        ctx.fill();
-    }
-
     const drawCoordinateSystem = () => {
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
@@ -97,8 +98,8 @@ for (const canvas of document.getElementsByTagName("canvas")) {
         line([left, canvasY(0)], [right, canvasY(0)]);
         line([canvasX(0), top], [canvasX(0), bottom]);
 
-        const tickStepX = desiredStep(width / 8);
-        const tickStepY = desiredStep(height / 8);
+        const tickStepX = desiredStep(width() / 8);
+        const tickStepY = desiredStep(height() / 8);
 
         ctx.strokeStyle = "#888";
         ctx.lineWidth = 0.5;
@@ -121,7 +122,7 @@ for (const canvas of document.getElementsByTagName("canvas")) {
 
         // x-axis ticks
         ticks(positionToCanvasX(left), positionToCanvasX(right), tickStepX, (x) => {
-            let extentY = (tickStepY / 4) * canvasScaleX;
+            let extentY = (tickStepY / 4) * canvasScaleY();
             let cx = canvasX(x);
             let cy0 = canvasY(0);
             line([cx, cy0 - extentY], [cx, cy0 + extentY]);
@@ -133,7 +134,7 @@ for (const canvas of document.getElementsByTagName("canvas")) {
         ctx.textBaseline = "middle";
         // y-axis ticks
         ticks(positionToCanvasY(bottom), positionToCanvasY(top), tickStepY, (y) => {
-            let extentX = (tickStepX / 4) * canvasScaleY;
+            let extentX = (tickStepX / 4) * canvasScaleX();
             let cy = canvasY(y);
             let cx0 = canvasX(0);
             line([cx0 - extentX, cy], [cx0 + extentX, cy]);
