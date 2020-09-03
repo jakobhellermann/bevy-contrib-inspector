@@ -1,4 +1,4 @@
-use crossbeam_channel::{unbounded as channel, Receiver, Sender};
+use flume::{unbounded as channel, Receiver, Sender};
 use tiny_http::{Method, Request, Response, Server, StatusCode};
 
 type Event = (String, String);

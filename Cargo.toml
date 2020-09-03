@@ -12,11 +12,14 @@ categories = ["development-tools::procedural-macro-helpers", "game-development",
 
 [dependencies]
 bevy-contrib-inspector-derive = { path = "./bevy-contrib-inspector-derive" }
-bevy = "0.1"
+bevy = { version = "0.1", default-features = false }
 
-crossbeam-channel = "0.4"
+flume = { version = "0.8", default-features = false }
 tiny_http = "0.7"
 webbrowser = "0.5"
+
+[dev-dependencies]
+bevy = "0.1"
 
 [profile.dev.package."*"]
 opt-level = 2
