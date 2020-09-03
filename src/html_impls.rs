@@ -182,9 +182,9 @@ impl AsHtml for Vec2 {
                         data-vec2d-default="{default_x},{default_y}"
                         data-vec2d-min="{min_x},{min_y}"
                         data-vec2d-max="{max_x},{max_y}"
-                        width="200" height="200"
+                        width="240" height="240"
                         id="{label}"
-                        style="width: 10rem; height: 10rem; border: 1px solid #000" />
+                        style="width: 12rem; height: 12rem; border: 1px solid #000" />
                 </div>
             </div>
         </div>

@@ -17,9 +17,10 @@ function parsePoint(point) {
     return { x: parseFloat(x), y: parseFloat(y) };
 }
 
-const roundTowards = (value, towards) => Math.round(value / towards) * towards;
 const ticks = (start, end, step, f) => {
-    for (value = roundTowards(start, step); value < end; value += step) {
+    let firstTick = Math.round(start / step) * step; // round towards step
+    for (let value = firstTick; value < end; value += step) {
+        value = parseFloat(value.toFixed(6));
         f(value);
     }
 };
@@ -35,10 +36,13 @@ for (const canvas of document.getElementsByTagName("canvas")) {
     currentPoints[canvas.id] = defaultValue;
 
     let ctx = canvas.getContext("2d");
-    ctx.font = "1em sans";
+    ctx.font = "0.8em sans";
 
     const canvasWidth = canvas.width;
     const canvasHeight = canvas.height;
+
+    const canvasScaleX = canvasWidth / width;
+    const canvasScaleY = canvasHeight / height;
 
     const left = 0, right = canvasWidth, top = 0, bottom = canvasHeight;
 
@@ -93,39 +97,49 @@ for (const canvas of document.getElementsByTagName("canvas")) {
         line([left, canvasY(0)], [right, canvasY(0)]);
         line([canvasX(0), top], [canvasX(0), bottom]);
 
-        ctx.lineWidth = 0.5;
+        const tickStepX = desiredStep(width / 8);
+        const tickStepY = desiredStep(height / 8);
+
         ctx.strokeStyle = "#888";
-
-        ctx.textBaseline = "middle";
-        ctx.textAlign = "center";
-
-        const tickStepX = desiredStep(width / 10);
+        ctx.lineWidth = 0.5;
+        // vertical grid lines
         ticks(positionToCanvasX(left), positionToCanvasX(right), tickStepX, (x) => {
             const cx = canvasX(x);
             line([cx, top], [cx, bottom]);
         });
-        // ticks(positionToCanvasX(left), positionToCanvasX(right), 1, (x) => {
-        //     text(x.toString(), canvasX(x), canvasY(-0.2));
-        // });
-
-        const tickStepY = desiredStep(height / 10);
+        // horizontal grid lines
         ticks(positionToCanvasY(bottom), positionToCanvasY(top), tickStepY, (y) => {
             const cy = canvasY(y);
             line([left, cy], [right, cy]);
         });
-        // ticks(positionToCanvasY(bottom), positionToCanvasY(top), 1, (y) => {
-        //     text(y.toString(), canvasX(-0.2), canvasY(y));
-        // });
-        ctx.strokeStyle = "#000";
 
-        /*ctx.textBaseline = "top";
-        text("-1", 0.02, 0.52);
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 1;
+
+        ctx.textAlign = "center";
+        ctx.textBaseline = "alphabetic";
+
+        // x-axis ticks
+        ticks(positionToCanvasX(left), positionToCanvasX(right), tickStepX, (x) => {
+            let extentY = (tickStepY / 4) * canvasScaleX;
+            let cx = canvasX(x);
+            let cy0 = canvasY(0);
+            line([cx, cy0 - extentY], [cx, cy0 + extentY]);
+
+            if (x !== 0) text(x.toString(), canvasX(x), canvasY(0) - extentY * 1.5);
+        });
+
         ctx.textAlign = "right";
-        text("1", 0.98, 0.52);
-        text("-1", 0.48, 0.02);
-        ctx.textBaseline = "alphabetic"
-        text("-1", 0.48, 0.98);
-        ctx.textAlign = "left";*/
+        ctx.textBaseline = "middle";
+        // y-axis ticks
+        ticks(positionToCanvasY(bottom), positionToCanvasY(top), tickStepY, (y) => {
+            let extentX = (tickStepX / 4) * canvasScaleY;
+            let cy = canvasY(y);
+            let cx0 = canvasX(0);
+            line([cx0 - extentX, cy], [cx0 + extentX, cy]);
+
+            if (y !== 0) text(y.toString(), canvasX(0) - extentX * 1.5, canvasY(y));
+        });
 
         const mouse = currentPoints[canvas.id];
         circle(canvasX(mouse.x), canvasY(mouse.y), 5);
