@@ -177,7 +177,29 @@ for (const canvas of document.getElementsByTagName("canvas")) {
         canvas.dispatchEvent(new CustomEvent("vec2d-data", { detail: position }));
     };
 
+    const zoom = (e) => {
+        e.preventDefault();
 
+        const factor = 1 + e.deltaY * 0.05;
+        const { x, y } = positionFromCanvasEvent(canvas, e);
+
+        // the percentage of the point from start to end stays the same (I)
+        // and sizeBefore * factor = sizeAfter (II);
+        // Applies for both x and y;
+
+        // I:  (x-minBefore) / (maxBefore-minBefore) = (x-minAfter) / (maxAfter-minAfter)
+        // II: (maxBefore-minBefore)*factor = (maxAfter-minAfter)
+        // WolframAlpha: solve((x-a)/(b-a)=(x-g)/(h-g), (b-a)*f=(h-g), g, h)
+        // g = a f - f x + x and h = b f - f x + x and a f!=b f
+
+        min.x = min.x * factor - factor * x + x;
+        max.x = max.x * factor - factor * x + x;
+
+        min.y = min.y * factor - factor * y + y;
+        max.y = max.y * factor - factor * y + y;
+
+        drawCoordinateSystem();
+    };
 
     canvas.addEventListener("mousemove", (e) => {
         if (isDragging) {
@@ -193,4 +215,6 @@ for (const canvas of document.getElementsByTagName("canvas")) {
 
     canvas.addEventListener("mouseup", endDrag);
     canvas.addEventListener("mouseout", endDrag);
+
+    canvas.addEventListener("wheel", zoom);
 }
