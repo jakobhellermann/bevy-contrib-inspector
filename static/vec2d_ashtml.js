@@ -42,14 +42,34 @@ for (const canvas of document.getElementsByTagName("canvas")) {
 
     const left = 0, right = canvasWidth, top = 0, bottom = canvasHeight;
 
+    let isDragging = false;
+    let currentDrag = { x: 0, y: 0 };
+    let dragStart = { x: 0, y: 0 };
+
     // from [min.x, max.x] to [0, canvasWidth]
-    const canvasX = x => (x - min.x) / (max.x - min.x) * canvasWidth;
+    const canvasX = x => ((x - currentDrag.x) - min.x) / (max.x - min.x) * canvasWidth;
     // from [min.y, max.y] to [canvasHeight, 0]
-    const canvasY = y => (y - max.y) / (min.y - max.y) * canvasHeight;
+    const canvasY = y => ((y - currentDrag.y) - max.y) / (min.y - max.y) * canvasHeight;
     // [0, canvasWidth] to [min.x, max.x]
-    const positionToCanvasX = x => x / canvasWidth * (max.x - min.x) + min.x;
-    // [canvasHeight, 0] to [min.y, max.y]
-    const positionToCanvasY = y => y / canvasHeight * (min.y - max.y) + max.y;
+    const positionToCanvasX = x => (x / canvasWidth * (max.x - min.x) + min.x) + currentDrag.x;
+    // [canvasHeight, 0] to [min.y, max.y
+    const positionToCanvasY = y => (y / canvasHeight * (min.y - max.y) + max.y) + currentDrag.y;
+
+    const positionFromCanvasEvent = (canvas, e, withDragOffset = true) => {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        let x = positionToCanvasX((e.clientX - rect.left) * scaleX);
+        let y = positionToCanvasY((e.clientY - rect.top) * scaleY);
+
+        if (!withDragOffset) {
+            x -= currentDrag.x;
+            y -= currentDrag.y;
+        }
+
+        return { x, y }
+    }
 
     const line = (from, to) => {
         ctx.beginPath();
@@ -113,19 +133,49 @@ for (const canvas of document.getElementsByTagName("canvas")) {
 
     drawCoordinateSystem();
 
-    canvas.addEventListener("mousemove", (e) => {
-        if (e.buttons !== 1) return;
+    const beginDrag = (e) => {
+        const position = positionFromCanvasEvent(canvas, e, false);
+        isDragging = true;
+        dragStart = position;
+    }
 
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
+    const endDrag = () => {
+        isDragging = false;
+        dragStart = { x: 0, y: 0 };
+    }
 
-        const x = positionToCanvasX((e.clientX - rect.left) * scaleX);
-        const y = positionToCanvasY((e.clientY - rect.top) * scaleY);
+    const handleDrag = (e) => {
+        const mousePoint = positionFromCanvasEvent(canvas, e, false);
+        let diff = { x: dragStart.x - mousePoint.x, y: dragStart.y - mousePoint.y }
+        currentDrag.x += diff.x;
+        currentDrag.y += diff.y;
+        dragStart = mousePoint;
 
-        currentPoints[e.target.id] = { x, y };
-
-        canvas.dispatchEvent(new CustomEvent("vec2d-data", { detail: { x, y } }));
         drawCoordinateSystem();
+    };
+
+    const handlePointSelection = (e) => {
+        const position = positionFromCanvasEvent(canvas, e);
+
+        currentPoints[e.target.id] = position;
+        drawCoordinateSystem();
+        canvas.dispatchEvent(new CustomEvent("vec2d-data", { detail: position }));
+    };
+
+
+
+    canvas.addEventListener("mousemove", (e) => {
+        if (isDragging) {
+            handleDrag(e);
+        } else if (e.buttons === 1) {
+            handlePointSelection(e);
+        }
     });
+    canvas.addEventListener("mousedown", (e) => {
+        if (e.shiftKey) beginDrag(e);
+        else handlePointSelection(e);
+    });
+
+    canvas.addEventListener("mouseup", endDrag);
+    canvas.addEventListener("mouseout", endDrag);
 }
