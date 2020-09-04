@@ -9,7 +9,6 @@ enum TextColor {
 }
 
 #[derive(Inspectable, Debug)]
-#[inspectable(port = 5676)]
 struct Data {
     #[inspectable(min = 10.0, max = 70.0)]
     font_size: f32,
