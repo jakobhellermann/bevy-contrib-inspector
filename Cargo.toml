@@ -11,7 +11,7 @@ keywords = ["bevy", "inspector", "visual", "editor", "game"]
 categories = ["development-tools::procedural-macro-helpers", "game-development", "gui", "visualization"]
 
 [features]
-native = ["web-view"]
+native = ["webview_official"]
 
 [dependencies]
 bevy-contrib-inspector-derive = { path = "./bevy-contrib-inspector-derive" }
@@ -21,7 +21,8 @@ flume = { version = "0.8", default-features = false }
 tiny_http = "0.7"
 
 webbrowser = "0.5"
-web-view = { version = "0.6", optional = true }
+# web-view = { version = "0.6", optional = true }
+webview_official = { version = "0.0.3", optional = true }
 
 [dev-dependencies]
 bevy = "0.1"

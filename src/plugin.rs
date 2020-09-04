@@ -46,15 +46,21 @@ fn open_inspector_window(addr: String) -> Result<(), std::io::Error> {
     Ok(())
 }
 #[cfg(feature = "native")]
-fn open_inspector_window(addr: String) -> Result<(), web_view::Error> {
+fn open_inspector_window(addr: String) -> Result<(), std::convert::Infallible> {
     std::thread::spawn(move || {
-        web_view::builder()
-            .title("Bevy Inspector")
-            .content(web_view::Content::Url(addr))
-            .user_data(())
-            .invoke_handler(|_webview, _arg| Ok(()))
-            .run()
-            .unwrap();
+        webview_official::WebviewBuilder::new()
+            .width(800)
+            .height(600)
+            .url(&addr)
+            .build()
+            .run();
+        /*web_view::builder()
+        .title("Bevy Inspector")
+        .content(web_view::Content::Url(addr))
+        .user_data(())
+        .invoke_handler(|_webview, _arg| Ok(()))
+        .run()
+        .unwrap();*/
     });
 
     Ok(())
