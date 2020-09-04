@@ -52,8 +52,8 @@ macro_rules! impl_ashtml_for_int {
 impl_ashtml_for_int!(u8 => NumberAttributes { min: std::u8::MIN, max: std::u8::MAX, step: 1 } ; std::num::ParseIntError);
 impl_ashtml_for_int!(i8 => NumberAttributes { min: std::i8::MIN, max: std::i8::MAX, step: 1 } ; std::num::ParseIntError);
 
-impl_ashtml_for_int!(u16, u32, u64 => NumberAttributes { min: 0, max: 100, step: 1 } ; std::num::ParseIntError);
-impl_ashtml_for_int!(i16, i32, i64 => NumberAttributes { min: 0, max: 100, step: 1 } ; std::num::ParseIntError);
+impl_ashtml_for_int!(u16, u32, u64, u128, usize => NumberAttributes { min: 0, max: 100, step: 1 } ; std::num::ParseIntError);
+impl_ashtml_for_int!(i16, i32, i64, i128, isize => NumberAttributes { min: 0, max: 100, step: 1 } ; std::num::ParseIntError);
 
 impl_ashtml_for_int!(f32, f64 => NumberAttributes { min: 0.0, max: 1.0, step: 0.01 } ; std::num::ParseFloatError );
 
