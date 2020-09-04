@@ -41,3 +41,9 @@ struct Data {
 ```
 The attribute on the struct will accept fields of the type [`InspectableOptions`],
 while the attributes on the fields accept those of their [`<Type as AsHtml>::Options`](as_html::AsHtml).
+
+
+## Features
+`native`: Instead of opening the inspector window in a browser, start a webkit2gtk window.
+
+On ubuntu, the feature requires `sudo apt install libwebkit2gtk-4.0-dev`

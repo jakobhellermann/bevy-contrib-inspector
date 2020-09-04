@@ -10,13 +10,18 @@ repository = "https://github.com/jakobhellermann/bevy-contrib-inspector"
 keywords = ["bevy", "inspector", "visual", "editor", "game"]
 categories = ["development-tools::procedural-macro-helpers", "game-development", "gui", "visualization"]
 
+[features]
+native = ["web-view"]
+
 [dependencies]
 bevy-contrib-inspector-derive = { path = "./bevy-contrib-inspector-derive" }
 bevy = { version = "0.1", default-features = false }
 
 flume = { version = "0.8", default-features = false }
 tiny_http = "0.7"
+
 webbrowser = "0.5"
+web-view = { version = "0.6", optional = true }
 
 [dev-dependencies]
 bevy = "0.1"

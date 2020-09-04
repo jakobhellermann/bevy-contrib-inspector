@@ -1,4 +1,6 @@
 const throttle = (func, limit) => {
+    if (!limit) return func;
+
     let lastFunc, lastRan;
     return function () {
         const context = this, args = arguments;
