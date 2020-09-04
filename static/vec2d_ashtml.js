@@ -187,16 +187,39 @@ for (const canvas of document.getElementsByTagName("canvas")) {
         // and sizeBefore * factor = sizeAfter (II);
         // Applies for both x and y;
 
-        // I:  (x-minBefore) / (maxBefore-minBefore) = (x-minAfter) / (maxAfter-minAfter)
-        // II: (maxBefore-minBefore)*factor = (maxAfter-minAfter)
-        // WolframAlpha: solve((x-a)/(b-a)=(x-g)/(h-g), (b-a)*f=(h-g), g, h)
-        // g = a f - f x + x and h = b f - f x + x and a f!=b f
+        // WHY CANNOT WOLFRAM ALPHA DO MULTICHARATER VARIABLES AAAHRRG
+        // minBeforeX = a, maxBeforeX = b
+        // minAfterX = g, maxAfterX = h
+        // minBeforeY = c, maxBeforeY = d
+        // minAfterY = i, maxAfterY = j
+
+        // I(x,y):  (x-minBefore) / (maxBefore-minBefore) = (x-minAfter) / (maxAfter-minAfter)
+        // II(x,y): (maxBefore-minBefore)*factor = (maxAfter-minAfter)
+        // III: (widthAfter / widthBefore) = (heightAfter / heightBefore) = ((maxAfterX-maxBeforeX)/(maxBeforeX-minBeforeX)) = ((maxAfterY-maxBeforeY)/(maxBeforeY-minBeforeY))
+        // solve(
+        // (x-a)/(b-a)=(x-g)/(h-g),
+        // (b-a)*f=(h-g),
+        // (y-c)/(d-c)=(y-i)/(j-i),
+        // (d-c)*f=(j-i),
+        // (h-g)/(b-a)=(j-i)/(d-c) # III, x scales same as y
+        // g, h, i, j)
+        //
+        // g = a f - f x + x and h = b f - f x + x
+        // i = c f - f y + y and i = d f - f y + y
+
+        const oldW = width();
+        const oldH = height();
 
         min.x = min.x * factor - factor * x + x;
         max.x = max.x * factor - factor * x + x;
 
         min.y = min.y * factor - factor * y + y;
         max.y = max.y * factor - factor * y + y;
+
+        const newW = width();
+        const newH = height();
+
+        console.log(newW / oldW, newH / oldH); // WHY ISN'T THIS EQUAL MATH SAYS IT IS EQUAL
 
         drawCoordinateSystem();
     };
@@ -216,5 +239,5 @@ for (const canvas of document.getElementsByTagName("canvas")) {
     canvas.addEventListener("mouseup", endDrag);
     canvas.addEventListener("mouseout", endDrag);
 
-    canvas.addEventListener("wheel", zoom);
+    // canvas.addEventListener("wheel", zoom);
 }
