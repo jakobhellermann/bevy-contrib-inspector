@@ -15,7 +15,7 @@ struct Data {
     size: f32,
 }
 ```
-Add the [`InspectorPlugin`] to your App.
+Add the `InspectorPlugin` to your App.
 ```rust,no_run
 use bevy_contrib_inspector::InspectorPlugin;
 
@@ -30,7 +30,7 @@ fn main() {
 To automatically open the webbrowser when starting, run your program using `BEVY_INSPECTOR_OPEN=1 cargo run`.
 
 ## Attributes
-When deriving the [`Inspectable`] trait, you can set options such like the port the server will run on like so:
+When deriving the `Inspectable` trait, you can set options such like the port the server will run on like so:
 ```rust
 #[derive(Inspectable, Default)]
 #[inspectable(port = 1234)]
@@ -39,8 +39,8 @@ struct Data {
    field: Type,
 }
 ```
-The attribute on the struct will accept fields of the type [`InspectableOptions`],
-while the attributes on the fields accept those of their [`<Type as AsHtml>::Options`](as_html::AsHtml).
+The attribute on the struct will accept fields of the type `InspectableOptions`,
+while the attributes on the fields accept those of their `<Type as AsHtml>::Options`.
 
 
 ## Features

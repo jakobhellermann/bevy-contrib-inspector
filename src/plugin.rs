@@ -73,14 +73,18 @@ fn should_open_browser() -> bool {
 
 #[cfg(not(feature = "native"))]
 fn should_open_browser() -> bool {
-    std::env::var("BEVY_INSPECTOR_OPEN").map_or(false, |var| match var.as_str() {
+    let is_confirmation = |var: String| match var.as_str() {
         "1" | "true" | "yes" | "y" => true,
         "0" | "false" | "no" | "n" => false,
         other => {
             eprintln!("unexpected value for BEVY_INSPECTOR_OPEN: {}", other);
             false
         }
-    })
+    };
+
+    let variable =
+        std::env::var("BEVY_INSPECTOR_OPEN").or_else(|_| std::env::var("BEVY_OPEN_INSPECTOR"));
+    variable.map_or(false, is_confirmation)
 }
 
 impl<T: Inspectable + Default> Plugin for InspectorPlugin<T> {
