@@ -42,6 +42,9 @@ struct Data {
 The attribute on the struct will accept fields of the type `InspectableOptions`,
 while the attributes on the fields accept those of their `<Type as AsHtml>::Options`.
 
+## Demo
+
+![demo video](./docs/bevy_inspector_demo.mp4)
 
 ## Features
 `native`: Instead of opening the inspector window in a browser, start a webkit2gtk window.
