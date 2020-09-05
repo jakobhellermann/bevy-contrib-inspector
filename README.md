@@ -1,6 +1,5 @@
 # bevy-contrib-inspector
 
-
 <div align="center">
   <!-- Crates version -->
   <a href="https://crates.io/crates/bevy-contrib-inspector">
@@ -22,6 +21,8 @@ This crate provides the ability to annotate structs with a `#[derive(Inspectable
 which opens a web interface (by default on port 5676) where you can visually edit the values of your struct live.
 
 Your struct will then be available to you as a bevy resource.
+
+<img src="./docs/demo.png" alt="Your image title" width="600"/>
 
 ## Example
 ```rust
@@ -64,10 +65,6 @@ struct Data {
 ```
 The attribute on the struct will accept fields of the type `InspectableOptions`,
 while the attributes on the fields accept those of their `<Type as AsHtml>::Options`.
-
-## Demo
-
-![demo video](./docs/bevy_inspector_demo.mp4)
 
 ## Features
 `native`: Instead of opening the inspector window in a browser, start a webkit2gtk window.
