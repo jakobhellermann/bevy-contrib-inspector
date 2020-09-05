@@ -15,6 +15,7 @@ native = ["webview_official"]
 
 [dependencies]
 bevy-contrib-inspector-derive = { path = "./bevy-contrib-inspector-derive" }
+# bevy-contrib-inspector-derive = "0.1.0"
 bevy = { version = "0.1", default-features = false }
 
 flume = { version = "0.8", default-features = false }

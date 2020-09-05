@@ -3,6 +3,9 @@ name = "bevy-contrib-inspector-derive"
 version = "0.1.0"
 authors = ["Jakob Hellermann <jakob.hellermann@protonmail.com>"]
 edition = "2018"
+license = "MIT"
+description = "Implementation detail of the `bevy-contrib-inspector` crate"
+repository = "https://github.com/jakobhellermann/bevy-contrib-inspector"
 
 [lib]
 proc-macro = true
@@ -10,4 +13,4 @@ proc-macro = true
 [dependencies]
 syn = "1.0"
 quote = "1.0"
-proc-macro2 = "1.0.19"
+proc-macro2 = "1.0"
