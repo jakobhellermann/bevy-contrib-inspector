@@ -3,6 +3,8 @@
 This crate provides the ability to annotate structs with a `#[derive(Inspectable)]`,
 which opens a web interface (by default on port 5676) where you can visually edit the values of your struct live.
 
+Your struct will then be available to you as a bevy resource.
+
 ## Example
 ```rust
 use bevy_contrib_inspector::Inspectable;
@@ -16,16 +18,19 @@ struct Data {
 }
 ```
 Add the `InspectorPlugin` to your App.
-```rust,no_run
+```rust
 use bevy_contrib_inspector::InspectorPlugin;
 
 fn main() {
     App::build()
         .add_default_plugins()
         .add_plugin(InspectorPlugin::<Data>::new())
+        .add_system(your_system.system())
         // ...
         .run();
 }
+
+fn your_system(data: Res<Data>, mut query: Query<...>) { /* */ }
 ```
 To automatically open the webbrowser when starting, run your program using `BEVY_INSPECTOR_OPEN=1 cargo run`.
 
