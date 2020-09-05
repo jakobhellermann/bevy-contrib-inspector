@@ -1,5 +1,23 @@
 # bevy-contrib-inspector
 
+
+<div align="center">
+  <!-- Crates version -->
+  <a href="https://crates.io/crates/bevy-contrib-inspector">
+    <img src="https://img.shields.io/crates/v/bevy-contrib-inspector.svg?style=flat-square"
+    alt="Crates.io version" />
+  </a>
+  <!-- docs.rs docs -->
+  <a href="https://docs.rs/bevy-contrib-inspector">
+    <img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square"
+      alt="docs.rs docs" />
+  </a>
+  <!-- License -->
+    <img src="https://img.shields.io/crates/l/bevy-contrib-inspector?style=flat-square"
+      alt="Download" />
+</div>
+<br/>
+
 This crate provides the ability to annotate structs with a `#[derive(Inspectable)]`,
 which opens a web interface (by default on port 5676) where you can visually edit the values of your struct live.
 
