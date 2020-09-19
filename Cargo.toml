@@ -1,6 +1,6 @@
 [package]
 name = "bevy-contrib-inspector"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Jakob Hellermann <jakob.hellermann@protonmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -15,7 +15,7 @@ native = ["webview_official"]
 
 [dependencies]
 bevy-contrib-inspector-derive = { path = "./bevy-contrib-inspector-derive" }
-# bevy-contrib-inspector-derive = "0.1.0"
+# bevy-contrib-inspector-derive = "0.2"
 bevy = { version = "0.2", default-features = false }
 
 flume = { version = "0.9", default-features = false }
