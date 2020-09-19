@@ -57,17 +57,17 @@ fn text_update_system(data: Res<Data>, mut query: Query<&mut Text>) {
 fn shape_update_system(
     data: Res<Data>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    mut query: Query<(&Handle<ColorMaterial>, &mut Translation)>,
+    mut query: Query<(&Handle<ColorMaterial>, &mut Transform)>,
 ) {
-    for (color, mut pos) in &mut query.iter() {
+    for (color, mut transfrom) in &mut query.iter() {
         let material = materials.get_mut(&color).unwrap();
         material.color = data.color;
 
         if !data.show_square {
-            pos.0.set_x(1000000.0)
+            transfrom.translation_mut().set_x(1000000.0);
         } else {
-            pos.0.set_x(data.position.x());
-            pos.0.set_y(data.position.y());
+            transfrom.translation_mut().set_x(data.position.x());
+            transfrom.translation_mut().set_y(data.position.y());
         }
     }
 }
@@ -106,8 +106,9 @@ fn setup(
             material: color,
             sprite: Sprite {
                 size: Vec2::new(40.0, 40.0),
+                ..Default::default()
             },
-            translation: Translation(Vec3::new(0.0, 0.0, 0.0)),
+            transform: Transform::from_translation(Vec3::default()),
             ..Default::default()
         });
 }

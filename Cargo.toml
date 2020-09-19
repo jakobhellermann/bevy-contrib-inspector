@@ -16,9 +16,9 @@ native = ["webview_official"]
 [dependencies]
 bevy-contrib-inspector-derive = { path = "./bevy-contrib-inspector-derive" }
 # bevy-contrib-inspector-derive = "0.1.0"
-bevy = { version = "0.1", default-features = false }
+bevy = { version = "0.2", default-features = false }
 
-flume = { version = "0.8", default-features = false }
+flume = { version = "0.9", default-features = false }
 tiny_http = "0.7"
 
 webbrowser = "0.5"
@@ -26,7 +26,7 @@ webbrowser = "0.5"
 webview_official = { version = "0.0.3", optional = true }
 
 [dev-dependencies]
-bevy = "0.1"
+bevy = "0.2"
 
 [profile.dev.package."*"]
 opt-level = 2
