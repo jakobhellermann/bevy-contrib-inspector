@@ -34,7 +34,7 @@ impl Default for Data {
 
 fn main() {
     App::build()
-        .add_default_plugins()
+        .add_plugins(DefaultPlugins)
         .add_plugin(InspectorPlugin::<Data>::new())
         .add_startup_system(setup.system())
         .add_system(text_update_system.system())
@@ -43,7 +43,7 @@ fn main() {
 }
 
 fn text_update_system(data: Res<Data>, mut query: Query<&mut Text>) {
-    for mut text in &mut query.iter() {
+    for mut text in query.iter_mut() {
         text.value = format!("{}", data.text);
         text.style.font_size = data.font_size;
         text.style.color = match &data.text_color {
@@ -59,15 +59,15 @@ fn shape_update_system(
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut query: Query<(&Handle<ColorMaterial>, &mut Transform)>,
 ) {
-    for (color, mut transfrom) in &mut query.iter() {
-        let material = materials.get_mut(&color).unwrap();
+    for (color, mut transfrom) in query.iter_mut() {
+        let material = materials.get_mut(color).unwrap();
         material.color = data.color;
 
         if !data.show_square {
-            transfrom.translation_mut().set_x(1000000.0);
+            transfrom.translation.set_x(1000000.0);
         } else {
-            transfrom.translation_mut().set_x(data.position.x());
-            transfrom.translation_mut().set_y(data.position.y());
+            transfrom.translation.set_x(data.position.x());
+            transfrom.translation.set_y(data.position.y());
         }
     }
 }
@@ -77,9 +77,7 @@ fn setup(
     asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    let font_handle = asset_server
-        .load("/usr/share/fonts/truetype/noto/NotoMono-Regular.ttf")
-        .unwrap();
+    let font_handle = asset_server.load("/usr/share/fonts/truetype/noto/NotoMono-Regular.ttf");
 
     let color = materials.add(Color::BLUE.into());
 

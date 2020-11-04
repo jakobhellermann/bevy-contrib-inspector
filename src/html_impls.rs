@@ -110,9 +110,9 @@ fn color_to_string(c: &Color) -> String {
 
     let mut s = String::with_capacity(6);
     s.push('#');
-    write!(s, "{:02x}", (c.r * 255.0) as u8).unwrap();
-    write!(s, "{:02x}", (c.g * 255.0) as u8).unwrap();
-    write!(s, "{:02x}", (c.b * 255.0) as u8).unwrap();
+    write!(s, "{:02x}", (c.r() * 255.0) as u8).unwrap();
+    write!(s, "{:02x}", (c.g() * 255.0) as u8).unwrap();
+    write!(s, "{:02x}", (c.b() * 255.0) as u8).unwrap();
     s
 }
 fn string_to_color(s: &str) -> Result<Color, ()> {

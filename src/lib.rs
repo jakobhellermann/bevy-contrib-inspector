@@ -23,14 +23,15 @@
 //! # #[derive(bevy_contrib_inspector::Inspectable, Default)] struct Data {}
 //! fn main() {
 //!     App::build()
-//!         .add_default_plugins()
+//!         .add_plugins(DefaultPlugins)
 //!         .add_plugin(InspectorPlugin::<Data>::new())
 //!         .add_system(your_system.system())
 //!         // ...
 //!         .run();
 //! }
 //!
-//! fn your_system(data: Res<Data>, mut query: Query<...>) { /* */ }
+//! # fn your_system() {}
+//! // fn your_system(data: Res<Data>, mut query: Query<...>) { /* */ }
 //! ```
 //! To automatically open the webbrowser when starting, run your program using `BEVY_INSPECTOR_OPEN=1 cargo run`.
 //!
