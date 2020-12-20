@@ -49,7 +49,7 @@ fn main() {
         .run();
 }
 
-fn your_system(data: Res<Data>, mut query: Query<...>) { /* */ }
+fn your_system(data: ChangedRes<Data>, mut query: Query<...>) { /* */ }
 ```
 To automatically open the webbrowser when starting, run your program using `BEVY_INSPECTOR_OPEN=1 cargo run`.
 
