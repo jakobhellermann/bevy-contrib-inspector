@@ -22,7 +22,7 @@ impl<T: Inspectable> InspectorPlugin<T> {
         }
     }
 
-    fn start_server(mut commands: Commands) {
+    fn start_server(commands: &mut Commands) {
         let config = ServerConfig::new(T::html());
 
         let options = T::options();

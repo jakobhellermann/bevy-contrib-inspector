@@ -1,6 +1,6 @@
 [package]
 name = "bevy-contrib-inspector"
-version = "0.3.1"
+version = "0.4.0"
 authors = ["Jakob Hellermann <jakob.hellermann@protonmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -14,9 +14,9 @@ categories = ["development-tools::procedural-macro-helpers", "game-development",
 native = ["webview_official"]
 
 [dependencies]
-bevy-contrib-inspector-derive = { path = "./bevy-contrib-inspector-derive" }
-# bevy-contrib-inspector-derive = "0.3"
-bevy = { version = "0.3", default-features = false, features = ["render"] }
+# bevy-contrib-inspector-derive = { path = "./bevy-contrib-inspector-derive" }
+bevy-contrib-inspector-derive = "0.4"
+bevy = { version = "0.4", default-features = false, features = ["render"] }
 
 flume = { version = "0.10", default-features = false }
 tiny_http = "0.7"
@@ -26,7 +26,7 @@ webbrowser = "0.5"
 webview_official = { version = "0.0.3", optional = true }
 
 [dev-dependencies]
-bevy = { version = "0.3", default-features = false, features = ["render", "bevy_wgpu", "x11"] }
+bevy = { version = "0.4", default-features = false, features = ["render", "bevy_wgpu", "x11"] }
 
 [profile.dev.package."*"]
 opt-level = 2

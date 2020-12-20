@@ -64,16 +64,16 @@ fn shape_update_system(
         material.color = data.color;
 
         if !data.show_square {
-            transfrom.translation.set_x(1000000.0);
+            transfrom.translation.x = 1000000.0;
         } else {
-            transfrom.translation.set_x(data.position.x());
-            transfrom.translation.set_y(data.position.y());
+            transfrom.translation.x = data.position.x;
+            transfrom.translation.y = data.position.y;
         }
     }
 }
 
 fn setup(
-    mut commands: Commands,
+    commands: &mut Commands,
     asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
@@ -82,9 +82,9 @@ fn setup(
     let color = materials.add(Color::BLUE.into());
 
     commands
-        .spawn(UiCameraComponents::default())
-        .spawn(Camera2dComponents::default())
-        .spawn(TextComponents {
+        .spawn(Camera2dBundle::default())
+        .spawn(CameraUiBundle::default())
+        .spawn(TextBundle {
             style: Style {
                 align_self: AlignSelf::FlexEnd,
                 ..Default::default()
@@ -94,13 +94,13 @@ fn setup(
                 font: font_handle,
                 style: TextStyle {
                     font_size: 50.0,
-                    color: Color::WHITE,
+                    ..Default::default()
                 },
                 ..Default::default()
             },
             ..Default::default()
         })
-        .spawn(SpriteComponents {
+        .spawn(SpriteBundle {
             material: color,
             sprite: Sprite {
                 size: Vec2::new(40.0, 40.0),

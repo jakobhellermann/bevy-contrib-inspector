@@ -197,12 +197,12 @@ impl AsHtml for Vec2 {
             }});
         </script>
         "#,
-            default_x = shared.default.x(),
-            default_y = shared.default.y(),
-            min_x = options.min.x(),
-            min_y = options.min.y(),
-            max_x = options.max.x(),
-            max_y = options.max.y(),
+            default_x = shared.default.x,
+            default_y = shared.default.y,
+            min_x = options.min.x,
+            min_y = options.min.y,
+            max_x = options.max.x,
+            max_y = options.max.y,
             submit_fn = submit_fn,
             label = shared.label,
         )
