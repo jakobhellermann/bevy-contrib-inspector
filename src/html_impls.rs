@@ -1,5 +1,5 @@
 use crate::{as_html::AsHtml, as_html::SharedOptions};
-use bevy::prelude::*;
+use bevy::{math::const_vec2, prelude::*};
 
 pub struct NumberAttributes<T> {
     pub min: T,
@@ -173,8 +173,8 @@ impl AsHtml for Vec2 {
     type Err = ();
     type Options = Vec2Attributes;
     const DEFAULT_OPTIONS: Self::Options = Vec2Attributes {
-        min: unsafe { std::mem::transmute([-1.0f32, -1.0]) },
-        max: unsafe { std::mem::transmute([1.0f32, 1.0]) },
+        min: const_vec2!([-1.0, 1.0]),
+        max: const_vec2!([1.0, 1.0]),
     };
 
     fn as_html(shared: SharedOptions<Self>, options: Self::Options, submit_fn: String) -> String {
