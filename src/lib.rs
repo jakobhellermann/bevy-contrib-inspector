@@ -135,9 +135,7 @@ pub trait AsHtml: Sized + 'static {
         header: &mut String,
         footer: &mut String,
     ) {
-        println!("check {}", std::any::type_name::<Self>());
         if types.insert(std::any::TypeId::of::<Self>()) {
-            println!("insert {}", std::any::type_name::<Self>());
             header.push_str(Self::header());
             footer.push_str(Self::footer());
         }
