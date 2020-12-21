@@ -24,7 +24,7 @@ macro_rules! impl_ashtml_for_int {
                 "<script>Numscrubber.init()</script>"
             }
 
-            fn as_html(shared_options: crate::as_html::SharedOptions<Self>, options: Self::Options, submit_fn: &str) -> String {
+            fn as_html(shared_options: crate::as_html::SharedOptions<Self>, options: Self::Options, submit_fn: String) -> String {
                 format!(r#"
             <div class="row">
                 <label for="{label}" class="cell text-right">{label}:</label>
@@ -62,7 +62,7 @@ impl AsHtml for String {
     type Options = ();
     const DEFAULT_OPTIONS: Self::Options = ();
 
-    fn as_html(shared: SharedOptions<Self>, (): Self::Options, submit_fn: &str) -> String {
+    fn as_html(shared: SharedOptions<Self>, (): Self::Options, submit_fn: String) -> String {
         format!(
             r#"
             <div class="row">
@@ -86,7 +86,7 @@ impl AsHtml for bool {
     type Options = ();
     const DEFAULT_OPTIONS: Self::Options = ();
 
-    fn as_html(shared: SharedOptions<Self>, (): Self::Options, submit_fn: &str) -> String {
+    fn as_html(shared: SharedOptions<Self>, (): Self::Options, submit_fn: String) -> String {
         format!(
             r#"
             <div class="row">
@@ -136,7 +136,7 @@ impl AsHtml for Color {
 
     const DEFAULT_OPTIONS: Self::Options = ();
 
-    fn as_html(shared: SharedOptions<Self>, (): Self::Options, submit_fn: &'static str) -> String {
+    fn as_html(shared: SharedOptions<Self>, (): Self::Options, submit_fn: String) -> String {
         format!(
             r#"<div class="row">
                 <label for="{label}" class="cell text-right">{label}:</label>
@@ -162,14 +162,10 @@ impl AsHtml for Vec2 {
     type Options = Vec2Attributes;
     const DEFAULT_OPTIONS: Self::Options = Vec2Attributes {
         min: unsafe { std::mem::transmute([-1.0f32, -1.0]) },
-        max: unsafe { std::mem::transmute([-1.0f32, -1.0]) },
+        max: unsafe { std::mem::transmute([1.0f32, 1.0]) },
     };
 
-    fn as_html(
-        shared: SharedOptions<Self>,
-        options: Self::Options,
-        submit_fn: &'static str,
-    ) -> String {
+    fn as_html(shared: SharedOptions<Self>, options: Self::Options, submit_fn: String) -> String {
         format!(
             r#"
         <div class="row">

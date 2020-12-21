@@ -68,9 +68,8 @@ impl<'a> DeriveData<'a> {
             let ty = &field.ty;
 
             quote! {
-                #ident_str => match <#ty as bevy_contrib_inspector::as_html::AsHtml>::parse(&value) {
-                    Ok(val) => self.#ident = val,
-                    Err(e) => eprintln!("failed to parse '{}': {:?}", #ident_str, e),
+                #ident_str => if let Err(e) = <#ty as bevy_contrib_inspector::as_html::AsHtml>::update(&mut self.#ident, &value) {
+                    eprintln!("failed to parse '{}': {:?}", #ident_str, e);
                 }
             }
         });
@@ -118,9 +117,9 @@ fn html<'a>(fields: &[Field<'a>]) -> TokenStream {
             let mut options = #as_html::DEFAULT_OPTIONS;
             #(#option_fields)*
 
-            let submit_fn = concat!("(value => handleChange('", #ident_str, "', value))");
+            let submit_fn = concat!("(value => handleChange('", #ident_str, "', value))").to_string();
 
-            inputs.push_str(&#as_html::as_html(shared, options, &submit_fn));
+            inputs.push_str(&#as_html::as_html(shared, options, submit_fn));
         }
     });
 

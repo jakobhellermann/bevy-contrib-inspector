@@ -13,5 +13,5 @@ pub fn inspectable(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
 pub fn as_html(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = syn::parse_macro_input!(input as syn::DeriveInput);
 
-    as_html::DeriveData::expand(input).into()
+    as_html::expand(input).into()
 }

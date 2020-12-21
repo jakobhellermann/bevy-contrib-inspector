@@ -14,8 +14,8 @@ categories = ["development-tools::procedural-macro-helpers", "game-development",
 native = ["webview_official"]
 
 [dependencies]
-# bevy-contrib-inspector-derive = { path = "./bevy-contrib-inspector-derive" }
-bevy-contrib-inspector-derive = "0.4"
+bevy-contrib-inspector-derive = { path = "./bevy-contrib-inspector-derive" }
+# bevy-contrib-inspector-derive = "0.4"
 bevy = { version = "0.4", default-features = false, features = ["render"] }
 
 flume = { version = "0.10", default-features = false }

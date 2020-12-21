@@ -113,7 +113,7 @@ pub mod as_html {
 /// and what attributes you can apply to it using `#[inspector(min = 1, max = 2)]`
 pub trait AsHtml: Sized {
     /// The parse error type
-    type Err;
+    type Err: std::fmt::Debug;
     /// The attibutes you can set for a field
     type Options;
     /// Default options for the `Options`-type
@@ -138,9 +138,15 @@ pub trait AsHtml: Sized {
     fn as_html(
         shared: as_html::SharedOptions<Self>,
         options: Self::Options,
-        submit_fn: &'static str,
+        submit_fn: String,
     ) -> String;
 
     /// specifies how the type should be parsed
     fn parse(value: &str) -> Result<Self, Self::Err>;
+
+    fn update(&mut self, value: &str) -> Result<(), Self::Err> {
+        let value = Self::parse(value)?;
+        *self = value;
+        Ok(())
+    }
 }
