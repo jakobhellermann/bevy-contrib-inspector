@@ -173,7 +173,7 @@ impl AsHtml for Vec2 {
     type Err = ();
     type Options = Vec2Attributes;
     const DEFAULT_OPTIONS: Self::Options = Vec2Attributes {
-        min: const_vec2!([-1.0, 1.0]),
+        min: const_vec2!([-1.0, -1.0]),
         max: const_vec2!([1.0, 1.0]),
     };
 
