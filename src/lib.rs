@@ -111,7 +111,7 @@ pub mod as_html {
 ///
 /// It also specifies how the type is parsed from a string
 /// and what attributes you can apply to it using `#[inspector(min = 1, max = 2)]`
-pub trait AsHtml: Sized {
+pub trait AsHtml: Sized + 'static {
     /// The parse error type
     type Err: std::fmt::Debug;
     /// The attibutes you can set for a field
@@ -126,6 +126,21 @@ pub trait AsHtml: Sized {
     /// HTML that needs to go to the bottom of the page, e.g. initializer js glue.
     fn footer() -> &'static str {
         ""
+    }
+
+    #[doc(hidden)]
+    /// This function is called in order to prevent multiple headers/footers from being loaded
+    fn register_header_footer(
+        types: &mut std::collections::HashSet<std::any::TypeId>,
+        header: &mut String,
+        footer: &mut String,
+    ) {
+        println!("check {}", std::any::type_name::<Self>());
+        if types.insert(std::any::TypeId::of::<Self>()) {
+            println!("insert {}", std::any::type_name::<Self>());
+            header.push_str(Self::header());
+            footer.push_str(Self::footer());
+        }
     }
 
     /// The actual html content.

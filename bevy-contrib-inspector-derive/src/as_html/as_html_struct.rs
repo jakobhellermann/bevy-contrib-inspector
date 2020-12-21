@@ -19,6 +19,7 @@ pub fn to_tokens(data: DeriveDataStruct<'_>) -> TokenStream {
 
         quote! { #field_name => self.#accessor = <#ty as bevy_contrib_inspector::AsHtml>::parse(value).map_err(|e| format!("{:?}", e))? }
     });
+    let tys = fields.iter().map(|field| &field.ty);
 
     quote! {
     #[allow(warnings)]
@@ -35,7 +36,13 @@ pub fn to_tokens(data: DeriveDataStruct<'_>) -> TokenStream {
             #html
         }
 
-        // TODO footer and header
+        fn register_header_footer(
+            types: &mut std::collections::HashSet<std::any::TypeId>,
+            header: &mut String,
+            footer: &mut String,
+        ) {
+            #(<#tys as bevy_contrib_inspector::as_html::AsHtml>::register_header_footer(types, header, footer);)*
+        }
 
         fn parse(_: &str) -> Result<Self, Self::Err> {
             unreachable!("AsHtml::update will be used instead")

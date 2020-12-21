@@ -133,12 +133,7 @@ fn html<'a>(fields: &[Field<'a>]) -> TokenStream {
         let mut footer = String::new();
         let mut field_types = std::collections::HashSet::<std::any::TypeId>::new();
 
-        #(
-        if field_types.insert(std::any::TypeId::of::<#tys>()) {
-            header.push_str(<#tys as bevy_contrib_inspector::as_html::AsHtml>::header());
-            footer.push_str(<#tys as bevy_contrib_inspector::as_html::AsHtml>::footer());
-        }
-        )*
+        #(<#tys as bevy_contrib_inspector::as_html::AsHtml>::register_header_footer(&mut field_types, &mut header, &mut footer);)*
 
         let mut inputs = String::new();
         let defaults = <Self as std::default::Default>::default();
