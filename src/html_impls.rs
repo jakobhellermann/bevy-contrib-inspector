@@ -24,6 +24,18 @@ macro_rules! impl_ashtml_for_int {
                 "<script>Numscrubber.init()</script>"
             }
 
+            // we overwrite this and only check for u8, since the footer and header is the same for all number types
+            fn register_header_footer(
+                types: &mut std::collections::HashSet<std::any::TypeId>,
+                header: &mut String,
+                footer: &mut String,
+            ) {
+                if types.insert(std::any::TypeId::of::<u8>()) {
+                    header.push_str(Self::header());
+                    footer.push_str(Self::footer());
+                }
+            }
+
             fn as_html(shared_options: crate::as_html::SharedOptions<Self>, options: Self::Options, submit_fn: String) -> String {
                 format!(r#"
             <div class="row">
