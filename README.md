@@ -17,6 +17,10 @@
 </div>
 <br/>
 
+## DISCLAIMER: you probably want to use [bevy-inspector-egui](https://github.com/jakobhellermann/bevy-inspector-egui) instead
+
+
+
 This crate provides the ability to annotate structs with a `#[derive(Inspectable)]`,
 which opens a web interface (by default on port 5676) where you can visually edit the values of your struct live.
 
